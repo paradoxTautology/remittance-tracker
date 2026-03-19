@@ -1,13 +1,42 @@
 {
   "name": "remittance-tracker",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "ERA/EOB claims tracker with PDF import and payer analytics",
+  "author": "paradoxTautology",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "vite build && VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "electron:build": "vite build && electron-builder --mac",
+    "dist": "vite build && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.paradoxtautology.remittance-tracker",
+    "productName": "Remittance Tracker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "build/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.healthcare-fitness",
+      "icon": "build/icon.png",
+      "target": [
+        "dmg"
+      ]
+    },
+    "dmg": {
+      "title": "Remittance Tracker",
+      "icon": "build/icon.png"
+    }
   },
   "dependencies": {
     "pdfjs-dist": "^5.5.207",
@@ -19,6 +48,8 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",

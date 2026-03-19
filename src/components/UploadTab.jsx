@@ -1,14 +1,14 @@
 import { useRef } from "react";
 import { STATUS_MAP } from "../utils/status";
 
-export default function UploadTab({ claimCount, onFile, onClear }) {
+export default function UploadTab({ claimCount, onFile, onClear, parsing }) {
   const fileRef = useRef(null);
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <div className="card" style={{ padding: 24, marginBottom: 16 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>
-          Upload Remittance CSV
+          Upload Remittance Data
         </h3>
         <p
           style={{
@@ -17,16 +17,15 @@ export default function UploadTab({ claimCount, onFile, onClear }) {
             marginBottom: 18,
           }}
         >
-          Export your ERA/EOB data as CSV from TriZetto, Availity, or your
-          clearinghouse.
+          Drop a TriZetto PDF directly, or a CSV export from any clearinghouse.
         </p>
 
         <div
           className="dz"
-          onClick={() => fileRef.current?.click()}
+          onClick={() => !parsing && fileRef.current?.click()}
           onDragOver={(e) => {
             e.preventDefault();
-            e.currentTarget.style.borderColor = "var(--accent)";
+            if (!parsing) e.currentTarget.style.borderColor = "var(--accent)";
           }}
           onDragLeave={(e) => {
             e.currentTarget.style.borderColor = "var(--border)";
@@ -34,33 +33,60 @@ export default function UploadTab({ claimCount, onFile, onClear }) {
           onDrop={(e) => {
             e.preventDefault();
             e.currentTarget.style.borderColor = "var(--border)";
-            if (e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+            if (!parsing && e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
           }}
+          style={parsing ? { opacity: 0.5, cursor: "wait" } : undefined}
         >
-          <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: "var(--text-secondary)",
-            }}
-          >
-            Drop CSV here or click to browse
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: "var(--text-muted)",
-              marginTop: 4,
-            }}
-          >
-            You'll map columns after upload
-          </div>
+          {parsing ? (
+            <>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "var(--accent)",
+                }}
+              >
+                Parsing PDF...
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-muted)",
+                  marginTop: 4,
+                }}
+              >
+                Extracting claims from remittance data
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "var(--text-secondary)",
+                }}
+              >
+                Drop PDF or CSV here
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-muted)",
+                  marginTop: 4,
+                }}
+              >
+                PDFs are parsed automatically — CSVs prompt column mapping
+              </div>
+            </>
+          )}
         </div>
 
         <input
           type="file"
-          accept=".csv"
+          accept=".csv,.pdf"
           ref={fileRef}
           onChange={(e) => {
             if (e.target.files[0]) onFile(e.target.files[0]);
@@ -70,29 +96,60 @@ export default function UploadTab({ claimCount, onFile, onClear }) {
       </div>
 
       <div className="card" style={{ padding: 20, marginBottom: 16 }}>
-        <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-          Supported Fields
-        </h4>
-        <p
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            lineHeight: 1.7,
-          }}
-        >
-          Patient Name, Member ID, Account #, ICN, Date of Service, CPT/Proc
-          Code, Payer, Billed, Allowed, Deductible, Coinsurance, Copay/Pt Resp,
-          Reason Codes, Provider Paid, Claim Status, Remark Codes
-        </p>
-        <p
-          style={{
-            fontSize: 10,
-            color: "var(--text-muted)",
-            marginTop: 6,
-          }}
-        >
-          You don't need all columns — just map what your CSV has.
-        </p>
+        <div style={{ display: "flex", gap: 12 }}>
+          <div
+            style={{
+              flex: 1,
+              padding: 14,
+              borderRadius: 8,
+              background: "var(--bg-input)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "var(--accent)",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                marginBottom: 6,
+              }}
+            >
+              PDF (recommended)
+            </div>
+            <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
+              TriZetto / Gateway EDI remittance PDFs are parsed directly — all
+              fields extracted automatically.
+            </p>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              padding: 14,
+              borderRadius: 8,
+              background: "var(--bg-input)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "var(--text-secondary)",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                marginBottom: 6,
+              }}
+            >
+              CSV
+            </div>
+            <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
+              Any clearinghouse CSV export — you'll map columns to fields after
+              upload.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="card" style={{ padding: 20, marginBottom: 16 }}>

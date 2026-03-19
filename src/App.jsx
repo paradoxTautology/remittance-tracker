@@ -13,17 +13,57 @@ export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [mapper, setMapper] = useState(null);
   const [detail, setDetail] = useState(null);
+  const [parsing, setParsing] = useState(false);
 
   const payers = [...new Set(claims.map((c) => c.payer).filter(Boolean))].sort();
 
-  const handleFile = (file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = parseCSV(e.target.result);
-      if (!result || !result.rows.length) return;
-      setMapper({ headers: result.headers, rows: result.rows });
-    };
-    reader.readAsText(file);
+  const handleFile = async (file) => {
+    const isPDF = file.name.toLowerCase().endsWith(".pdf");
+
+    if (isPDF) {
+      setParsing(true);
+      try {
+        const buffer = await file.arrayBuffer();
+        const { parseRemittancePDF } = await import("./utils/pdfParser");
+        const parsed = await parseRemittancePDF(buffer);
+
+        if (!parsed.length) {
+          alert("No claims found in this PDF. Make sure it's a TriZetto/Gateway EDI remittance.");
+          setParsing(false);
+          return;
+        }
+
+        // Add internal fields and derive status
+        const enriched = parsed.map((c, i) => ({
+          ...c,
+          billed: c.billed || 0,
+          allowed: c.allowed || 0,
+          deduct: c.deduct || 0,
+          coins: c.coins || 0,
+          copay: c.copay || 0,
+          prov_paid: c.prov_paid || 0,
+          _id: Date.now() + i + Math.random(),
+          _status: deriveStatus(c),
+          _imported: new Date().toISOString(),
+        }));
+
+        setClaims([...claims, ...enriched]);
+        setTab("claims");
+      } catch (err) {
+        console.error("PDF parse error:", err);
+        alert("Failed to parse PDF: " + err.message);
+      }
+      setParsing(false);
+    } else {
+      // CSV flow — show column mapper
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = parseCSV(e.target.result);
+        if (!result || !result.rows.length) return;
+        setMapper({ headers: result.headers, rows: result.rows });
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleConfirmMapping = (mapping) => {
@@ -136,6 +176,7 @@ export default function App() {
             claimCount={claims.length}
             onFile={handleFile}
             onClear={handleClear}
+            parsing={parsing}
           />
         )}
       </div>

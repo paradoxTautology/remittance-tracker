@@ -2,6 +2,7 @@ import { useState } from "react";
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import { exportClaimsCSV } from "../utils/csv";
+import ReasonCodeBadges from "./ReasonCodeBadges";
 
 function SortTh({ col, currentCol, currentDir, onSort, children, align }) {
   const active = currentCol === col;
@@ -275,17 +276,13 @@ export default function ClaimsTable({ claims, payers, onSelectClaim }) {
                         {formatDollar(paid)}
                       </td>
                       <td
-                        className="mono"
+                        onClick={(e) => e.stopPropagation()}
                         style={{
-                          fontSize: 10,
-                          color: "var(--yellow)",
-                          maxWidth: 110,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
+                          maxWidth: 150,
+                          padding: "8px 12px",
                         }}
                       >
-                        {c.reason_codes}
+                        <ReasonCodeBadges codes={c.reason_codes} />
                       </td>
                     </tr>
                   );

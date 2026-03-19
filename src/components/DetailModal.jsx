@@ -1,5 +1,6 @@
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
+import ReasonCodeBadges from "./ReasonCodeBadges";
 
 export default function DetailModal({ claim, onClose }) {
   if (!claim) return null;
@@ -27,6 +28,9 @@ export default function DetailModal({ claim, onClose }) {
 
   const isMoneyField = (label) =>
     /Billed|Allowed|Paid|Deduct|Coins|Copay/.test(label);
+
+  const isCodeField = (label) =>
+    /Reason Codes|Remark Codes/.test(label);
 
   return (
     <div
@@ -106,7 +110,11 @@ export default function DetailModal({ claim, onClose }) {
                   wordBreak: "break-all",
                 }}
               >
-                {value}
+                {isCodeField(label) ? (
+                  <ReasonCodeBadges codes={value} style={{ justifyContent: "flex-end" }} />
+                ) : (
+                  value
+                )}
               </span>
             </div>
           ))}

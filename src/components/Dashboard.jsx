@@ -1,5 +1,6 @@
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
+import ReasonCodeBadges from "./ReasonCodeBadges";
 
 export default function Dashboard({ claims, payers, onNavigate }) {
   const stats = {
@@ -242,18 +243,23 @@ export default function Dashboard({ claims, payers, onNavigate }) {
             {topCodes.map(([code, count]) => (
               <div
                 key={code}
-                className="mono"
                 style={{
-                  padding: "6px 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "4px 6px 4px 2px",
                   borderRadius: 8,
                   background: "var(--bg-input)",
                   border: "1px solid var(--border)",
-                  fontSize: 12,
                 }}
               >
-                <span style={{ fontWeight: 700 }}>{code}</span>
+                <ReasonCodeBadges codes={code} />
                 <span
-                  style={{ color: "var(--text-muted)", marginLeft: 6 }}
+                  className="mono"
+                  style={{
+                    fontSize: 11,
+                    color: "var(--text-muted)",
+                  }}
                 >
                   ×{count}
                 </span>

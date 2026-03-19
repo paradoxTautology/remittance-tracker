@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #0c0f14;
+  --bg-card: #151921;
+  --bg-input: #1c2130;
+  --bg-hover: #1e2538;
+  --border: #252d3d;
+  --accent: #3b82f6;
+  --accent-dim: #1e3a6e;
+  --green: #22c55e;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --purple: #a855f7;
+  --orange: #f97316;
+  --gray: #6b7280;
+  --text-primary: #e8eaf0;
+  --text-secondary: #8b95a8;
+  --text-muted: #5a6478;
+  --font: "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.mono { font-family: var(--font-mono); }
+
+input[type=file] { display: none; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.tab {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+.tab-on { background: var(--accent); color: #fff; }
+.tab-off { background: transparent; color: var(--text-secondary); }
+.tab-off:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+table { width: 100%; border-collapse: collapse; }
+td {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(37, 45, 61, 0.2);
+}
+tr:hover td { background: var(--bg-hover); cursor: pointer; }
+
+.fb {
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.fb:hover { border-color: var(--text-muted); }
+.fb-on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.dz {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dz:hover { border-color: var(--accent); background: rgba(30, 58, 110, 0.07); }
+
+select {
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font);
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+}

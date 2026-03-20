@@ -44,6 +44,8 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
   const WORK_ACTIONS = {
     appeal: { label: "Appealed", color: "#3b82f6", icon: "⟳" },
     resubmit: { label: "Resubmitted", color: "#3b82f6", icon: "⟳" },
+    email_payer: { label: "Emailed", color: "#eab308", icon: "✉" },
+    awaiting_info: { label: "Awaiting", color: "#f59e0b", icon: "⏳" },
     bill_patient: { label: "Billed Pt", color: "#f97316", icon: "$" },
     contact_payer: { label: "Contacted", color: "#8b5cf6", icon: "✆" },
     submit_secondary: { label: "Sent 2nd", color: "#a855f7", icon: "→" },

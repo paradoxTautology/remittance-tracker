@@ -4,8 +4,10 @@ import { formatDollar } from "../utils/format";
 const ACTIONS = [
   { value: "appeal", label: "Appeal", desc: "Submitting formal appeal to payer" },
   { value: "resubmit", label: "Resubmit", desc: "Correcting and resubmitting claim" },
-  { value: "bill_patient", label: "Bill Patient", desc: "Sending patient statement" },
+  { value: "email_payer", label: "Email Payer", desc: "Emailed insurance for info or resolution" },
+  { value: "awaiting_info", label: "Awaiting Info", desc: "Waiting on response from payer or patient" },
   { value: "contact_payer", label: "Contact Payer", desc: "Calling/writing payer for resolution" },
+  { value: "bill_patient", label: "Bill Patient", desc: "Sending patient statement" },
   { value: "submit_secondary", label: "Submit to Secondary", desc: "Filing with secondary insurance" },
   { value: "write_off", label: "Write Off", desc: "No further action — absorb cost" },
   { value: "other", label: "Other", desc: "Custom action" },
@@ -182,6 +184,16 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               <option value="Called payer — claim in review">Called payer — claim in review</option>
               <option value="Called payer — reprocessing requested">Called payer — reprocessing requested</option>
               <option value="Submitted appeal with medical records">Submitted appeal with medical records</option>
+            </optgroup>
+            <optgroup label="Email / Awaiting Response">
+              <option value="Emailed payer requesting patient policy number">Emailed payer requesting patient policy number</option>
+              <option value="Emailed payer requesting correct member ID">Emailed payer requesting correct member ID</option>
+              <option value="Emailed payer requesting primary EOB">Emailed payer requesting primary EOB</option>
+              <option value="Emailed payer requesting prior auth number">Emailed payer requesting prior auth number</option>
+              <option value="Emailed payer requesting COB update">Emailed payer requesting COB update</option>
+              <option value="Awaiting response from insurance — follow up in 7 days">Awaiting response — follow up in 7 days</option>
+              <option value="Awaiting response from insurance — follow up in 14 days">Awaiting response — follow up in 14 days</option>
+              <option value="Awaiting patient response — new insurance info needed">Awaiting patient — new insurance info needed</option>
             </optgroup>
             <optgroup label="Write-Off">
               <option value="Capitation — no action required">Capitation — no action required</option>

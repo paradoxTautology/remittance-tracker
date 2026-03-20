@@ -5,6 +5,8 @@ import ReasonCodeBadges from "./ReasonCodeBadges";
 const ACTION_LABELS = {
   appeal: "Appeal",
   resubmit: "Resubmit",
+  email_payer: "Email Payer",
+  awaiting_info: "Awaiting Info",
   bill_patient: "Bill Patient",
   contact_payer: "Contact Payer",
   submit_secondary: "Submit Secondary",

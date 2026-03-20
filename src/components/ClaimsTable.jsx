@@ -29,7 +29,7 @@ function SortTh({ col, currentCol, currentDir, onSort, children, align }) {
   );
 }
 
-export default function ClaimsTable({ claims, payers, onSelectClaim, initialSearch }) {
+export default function ClaimsTable({ claims, payers, onSelectClaim, initialSearch, workLogEntries = [] }) {
   const [filter, setFilter] = useState("all");
   const [payerFilter, setPayerFilter] = useState("all");
   const [search, setSearch] = useState(initialSearch || "");
@@ -40,6 +40,28 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
   useEffect(() => {
     if (initialSearch) setSearch(initialSearch);
   }, [initialSearch]);
+
+  const WORK_ACTIONS = {
+    appeal: { label: "Appealed", color: "#3b82f6", icon: "⟳" },
+    resubmit: { label: "Resubmitted", color: "#3b82f6", icon: "⟳" },
+    bill_patient: { label: "Billed Pt", color: "#f97316", icon: "$" },
+    contact_payer: { label: "Contacted", color: "#8b5cf6", icon: "✆" },
+    submit_secondary: { label: "Sent 2nd", color: "#a855f7", icon: "→" },
+    write_off: { label: "Written Off", color: "#6b7280", icon: "—" },
+    other: { label: "Worked", color: "#3b82f6", icon: "✎" },
+  };
+
+  const getWorkStatus = (claim) => {
+    const entry = workLogEntries.find(
+      (e) =>
+        e.patient === claim.patient &&
+        e.dos === claim.dos &&
+        e.cpt === claim.cpt &&
+        e.status !== "resolved"
+    );
+    if (!entry) return null;
+    return WORK_ACTIONS[entry.action] || WORK_ACTIONS.other;
+  };
 
   const toggleSort = (col) => {
     if (sortCol === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -188,6 +210,7 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
                     Status
                   </th>
                   <SortTh col="patient" currentCol={sortCol} currentDir={sortDir} onSort={toggleSort}>Patient</SortTh>
+                  <SortTh col="acnt" currentCol={sortCol} currentDir={sortDir} onSort={toggleSort}>Invoice #</SortTh>
                   <SortTh col="dos" currentCol={sortCol} currentDir={sortDir} onSort={toggleSort}>DOS</SortTh>
                   <SortTh col="cpt" currentCol={sortCol} currentDir={sortDir} onSort={toggleSort}>CPT</SortTh>
                   <SortTh col="payer" currentCol={sortCol} currentDir={sortDir} onSort={toggleSort}>Payer</SortTh>
@@ -212,17 +235,19 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
                 {filtered.slice(0, 200).map((c, i) => {
                   const st = STATUS_MAP[c._status] || STATUS_MAP.adjusted;
                   const paid = parseDollar(c.prov_paid);
+                  const workSt = getWorkStatus(c);
+                  const displaySt = workSt || st;
                   return (
                     <tr key={i} onClick={() => onSelectClaim(c)}>
                       <td>
                         <span
                           className="pill"
                           style={{
-                            background: st.color + "18",
-                            color: st.color,
+                            background: displaySt.color + "18",
+                            color: displaySt.color,
                           }}
                         >
-                          {st.icon} {st.label}
+                          {displaySt.icon} {displaySt.label}
                         </span>
                       </td>
                       <td
@@ -235,6 +260,9 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
                         }}
                       >
                         {c.patient}
+                      </td>
+                      <td className="mono" style={{ fontSize: 11 }}>
+                        {(c.acnt || "").replace(/^0+/, "")}
                       </td>
                       <td className="mono" style={{ fontSize: 11 }}>
                         {c.dos}

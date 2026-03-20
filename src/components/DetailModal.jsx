@@ -2,7 +2,7 @@ import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import ReasonCodeBadges from "./ReasonCodeBadges";
 
-export default function DetailModal({ claim, onClose }) {
+export default function DetailModal({ claim, onClose, onWorkClaim, isWorked }) {
   if (!claim) return null;
 
   const st = STATUS_MAP[claim._status] || STATUS_MAP.adjusted;
@@ -120,23 +120,47 @@ export default function DetailModal({ claim, onClose }) {
           ))}
         </div>
 
-        <button
-          onClick={onClose}
-          style={{
-            marginTop: 18,
-            width: "100%",
-            padding: "10px",
-            borderRadius: 8,
-            border: "1px solid var(--border)",
-            background: "transparent",
-            color: "var(--text-secondary)",
-            cursor: "pointer",
-            fontSize: 13,
-            fontFamily: "inherit",
-          }}
-        >
-          Close
-        </button>
+        <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: "10px",
+              borderRadius: 8,
+              border: "1px solid var(--border)",
+              background: "transparent",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+              fontSize: 13,
+              fontFamily: "inherit",
+            }}
+          >
+            Close
+          </button>
+          {onWorkClaim && (
+            <button
+              onClick={() => {
+                onWorkClaim(claim);
+                onClose();
+              }}
+              disabled={isWorked}
+              style={{
+                flex: 1,
+                padding: "10px",
+                borderRadius: 8,
+                border: "none",
+                background: isWorked ? "#252d3d" : "#3b82f6",
+                color: isWorked ? "#5a6478" : "#fff",
+                cursor: isWorked ? "default" : "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "inherit",
+              }}
+            >
+              {isWorked ? "Already Worked" : "Work Claim"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

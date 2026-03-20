@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useClaims } from "./hooks/useClaims";
+import { useWorkLog } from "./hooks/useWorkLog";
 import { parseCSV } from "./utils/csv";
 import { deriveStatus } from "./utils/status";
 import Dashboard from "./components/Dashboard";
@@ -7,19 +8,46 @@ import ClaimsTable from "./components/ClaimsTable";
 import UploadTab from "./components/UploadTab";
 import FieldMapper from "./components/FieldMapper";
 import DetailModal from "./components/DetailModal";
+import WorkClaimModal from "./components/WorkClaimModal";
+import WorkLog from "./components/WorkLog";
 
 export default function App() {
   const [claims, setClaims, clearClaims] = useClaims();
+  const workLog = useWorkLog();
   const [tab, setTab] = useState("dashboard");
   const [mapper, setMapper] = useState(null);
   const [detail, setDetail] = useState(null);
+  const [workTarget, setWorkTarget] = useState(null); // claim to work
   const [parsing, setParsing] = useState(false);
   const [claimsSearch, setClaimsSearch] = useState("");
 
   const payers = [...new Set(claims.map((c) => c.payer).filter(Boolean))].sort();
 
+  // Check if a claim has been worked
+  const isClaimWorked = (claim) => {
+    return workLog.entries.some(
+      (e) =>
+        e.patient === claim.patient &&
+        e.dos === claim.dos &&
+        e.cpt === claim.cpt
+    );
+  };
+
   const handleViewClaims = (code) => {
     setClaimsSearch(code);
+    setTab("claims");
+  };
+
+  // Import new claims and cross-reference against work log
+  const importClaims = (newClaims) => {
+    setClaims([...claims, ...newClaims]);
+
+    // Cross-reference: check if any pending work log entries are now resolved
+    const resolved = workLog.crossReference(newClaims);
+    if (resolved > 0) {
+      alert(`${resolved} previously worked claim${resolved > 1 ? "s" : ""} resolved with this import!`);
+    }
+
     setTab("claims");
   };
 
@@ -39,7 +67,6 @@ export default function App() {
           return;
         }
 
-        // Add internal fields and derive status
         const enriched = parsed.map((c, i) => ({
           ...c,
           billed: c.billed || 0,
@@ -53,15 +80,13 @@ export default function App() {
           _imported: new Date().toISOString(),
         }));
 
-        setClaims([...claims, ...enriched]);
-        setTab("claims");
+        importClaims(enriched);
       } catch (err) {
         console.error("PDF parse error:", err);
         alert("Failed to parse PDF: " + err.message);
       }
       setParsing(false);
     } else {
-      // CSV flow — show column mapper
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = parseCSV(e.target.result);
@@ -93,15 +118,23 @@ export default function App() {
       })
       .filter((c) => c.patient || c.dos);
 
-    setClaims([...claims, ...mapped]);
+    importClaims(mapped);
     setMapper(null);
-    setTab("claims");
   };
 
   const handleClear = () => {
     if (confirm("Clear ALL claim data? This cannot be undone.")) {
       clearClaims();
     }
+  };
+
+  const pendingCount = workLog.entries.filter((e) => e.status === "pending").length;
+
+  const TAB_LABELS = {
+    dashboard: "Dashboard",
+    claims: "Claims",
+    worklog: pendingCount > 0 ? `Work Log (${pendingCount})` : "Work Log",
+    upload: "Upload",
   };
 
   return (
@@ -114,7 +147,22 @@ export default function App() {
         />
       )}
       {detail && (
-        <DetailModal claim={detail} onClose={() => setDetail(null)} />
+        <DetailModal
+          claim={detail}
+          onClose={() => setDetail(null)}
+          onWorkClaim={(c) => {
+            setDetail(null);
+            setWorkTarget(c);
+          }}
+          isWorked={detail ? isClaimWorked(detail) : false}
+        />
+      )}
+      {workTarget && (
+        <WorkClaimModal
+          claim={workTarget}
+          onSubmit={(entry) => workLog.addEntry(entry)}
+          onClose={() => setWorkTarget(null)}
+        />
       )}
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 16px" }}>
@@ -146,7 +194,7 @@ export default function App() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
-            {["dashboard", "claims", "upload"].map((t) => (
+            {["dashboard", "claims", "worklog", "upload"].map((t) => (
               <button
                 key={t}
                 className={`tab ${tab === t ? "tab-on" : "tab-off"}`}
@@ -155,11 +203,7 @@ export default function App() {
                   setTab(t);
                 }}
               >
-                {t === "dashboard"
-                  ? "Dashboard"
-                  : t === "claims"
-                  ? "Claims"
-                  : "Upload"}
+                {TAB_LABELS[t]}
               </button>
             ))}
           </div>
@@ -180,6 +224,16 @@ export default function App() {
             payers={payers}
             onSelectClaim={setDetail}
             initialSearch={claimsSearch}
+            workLogEntries={workLog.entries}
+          />
+        )}
+        {tab === "worklog" && (
+          <WorkLog
+            entries={workLog.entries}
+            onUpdateEntry={workLog.updateEntry}
+            onRemoveEntry={workLog.removeEntry}
+            onClear={workLog.clearLog}
+            onViewClaims={handleViewClaims}
           />
         )}
         {tab === "upload" && (

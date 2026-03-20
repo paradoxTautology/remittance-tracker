@@ -156,6 +156,15 @@ export default function App() {
             setWorkTarget(c);
           }}
           isWorked={detail ? isClaimWorked(detail) : false}
+          onUnwork={(c) => {
+            const entry = workLog.entries.find(
+              (e) =>
+                e.patient === c.patient &&
+                e.dos === c.dos &&
+                e.cpt === c.cpt
+            );
+            if (entry) workLog.removeEntry(entry.id);
+          }}
         />
       )}
       {workTarget && (

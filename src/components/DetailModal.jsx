@@ -2,7 +2,7 @@ import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import ReasonCodeBadges from "./ReasonCodeBadges";
 
-export default function DetailModal({ claim, onClose, onWorkClaim, isWorked }) {
+export default function DetailModal({ claim, onClose, onWorkClaim, isWorked, onUnwork }) {
   if (!claim) return null;
 
   const st = STATUS_MAP[claim._status] || STATUS_MAP.adjusted;
@@ -137,28 +137,72 @@ export default function DetailModal({ claim, onClose, onWorkClaim, isWorked }) {
           >
             Close
           </button>
-          {onWorkClaim && (
+          {onWorkClaim && !isWorked && (
             <button
               onClick={() => {
                 onWorkClaim(claim);
                 onClose();
               }}
-              disabled={isWorked}
               style={{
                 flex: 1,
                 padding: "10px",
                 borderRadius: 8,
                 border: "none",
-                background: isWorked ? "#252d3d" : "#3b82f6",
-                color: isWorked ? "#5a6478" : "#fff",
-                cursor: isWorked ? "default" : "pointer",
+                background: "#3b82f6",
+                color: "#fff",
+                cursor: "pointer",
                 fontSize: 13,
                 fontWeight: 600,
                 fontFamily: "inherit",
               }}
             >
-              {isWorked ? "Already Worked" : "Work Claim"}
+              Work Claim
             </button>
+          )}
+          {isWorked && onUnwork && (
+            <>
+              <button
+                onClick={() => {
+                  onUnwork(claim);
+                  onClose();
+                }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  background: "rgba(239,68,68,0.1)",
+                  color: "#ef4444",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  fontFamily: "inherit",
+                }}
+              >
+                Unwork
+              </button>
+              <button
+                onClick={() => {
+                  onUnwork(claim);
+                  onWorkClaim(claim);
+                  onClose();
+                }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#3b82f6",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  fontFamily: "inherit",
+                }}
+              >
+                Rework
+              </button>
+            </>
           )}
         </div>
       </div>

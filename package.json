@@ -5,7 +5,7 @@
   "description": "ERA/EOB claims tracker with PDF import and payer analytics",
   "author": "paradoxTautology",
   "type": "module",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

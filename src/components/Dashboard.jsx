@@ -2,7 +2,7 @@ import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import ReasonCodeBadges from "./ReasonCodeBadges";
 
-export default function Dashboard({ claims, payers, onNavigate }) {
+export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) {
   const stats = {
     total: claims.length,
     totalBilled: claims.reduce((s, c) => s + parseDollar(c.billed), 0),
@@ -253,7 +253,7 @@ export default function Dashboard({ claims, payers, onNavigate }) {
                   border: "1px solid var(--border)",
                 }}
               >
-                <ReasonCodeBadges codes={code} />
+                <ReasonCodeBadges codes={code} onViewClaims={onViewClaims} />
                 <span
                   className="mono"
                   style={{

@@ -14,8 +14,14 @@ export default function App() {
   const [mapper, setMapper] = useState(null);
   const [detail, setDetail] = useState(null);
   const [parsing, setParsing] = useState(false);
+  const [claimsSearch, setClaimsSearch] = useState("");
 
   const payers = [...new Set(claims.map((c) => c.payer).filter(Boolean))].sort();
+
+  const handleViewClaims = (code) => {
+    setClaimsSearch(code);
+    setTab("claims");
+  };
 
   const handleFile = async (file) => {
     const isPDF = file.name.toLowerCase().endsWith(".pdf");
@@ -144,7 +150,10 @@ export default function App() {
               <button
                 key={t}
                 className={`tab ${tab === t ? "tab-on" : "tab-off"}`}
-                onClick={() => setTab(t)}
+                onClick={() => {
+                  setClaimsSearch("");
+                  setTab(t);
+                }}
               >
                 {t === "dashboard"
                   ? "Dashboard"
@@ -162,6 +171,7 @@ export default function App() {
             claims={claims}
             payers={payers}
             onNavigate={setTab}
+            onViewClaims={handleViewClaims}
           />
         )}
         {tab === "claims" && (
@@ -169,6 +179,7 @@ export default function App() {
             claims={claims}
             payers={payers}
             onSelectClaim={setDetail}
+            initialSearch={claimsSearch}
           />
         )}
         {tab === "upload" && (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import { exportClaimsCSV } from "../utils/csv";
@@ -29,12 +29,17 @@ function SortTh({ col, currentCol, currentDir, onSort, children, align }) {
   );
 }
 
-export default function ClaimsTable({ claims, payers, onSelectClaim }) {
+export default function ClaimsTable({ claims, payers, onSelectClaim, initialSearch }) {
   const [filter, setFilter] = useState("all");
   const [payerFilter, setPayerFilter] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch || "");
   const [sortCol, setSortCol] = useState("dos");
   const [sortDir, setSortDir] = useState("desc");
+
+  // Sync when navigated from Dashboard "View Claims"
+  useEffect(() => {
+    if (initialSearch) setSearch(initialSearch);
+  }, [initialSearch]);
 
   const toggleSort = (col) => {
     if (sortCol === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));

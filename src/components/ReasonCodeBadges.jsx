@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { lookupCode, CATEGORY_COLORS } from "../utils/reasonCodes";
 
-function CodePopover({ code, info, onClose, anchorRect }) {
+function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
   const ref = useRef(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
@@ -151,6 +151,38 @@ function CodePopover({ code, info, onClose, anchorRect }) {
             {info.fix}
           </div>
         </div>
+
+        {/* View Claims button */}
+        {onViewClaims && (
+          <button
+            onClick={() => {
+              onViewClaims(code);
+              onClose();
+            }}
+            style={{
+              marginTop: 14,
+              width: "100%",
+              padding: "10px",
+              borderRadius: 8,
+              border: "1px solid var(--accent, #3b82f6)",
+              background: "rgba(59, 130, 246, 0.1)",
+              color: "#3b82f6",
+              cursor: "pointer",
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: "inherit",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(59, 130, 246, 0.1)";
+            }}
+          >
+            View Claims with {code} →
+          </button>
+        )}
       </div>
     </>
   );
@@ -163,7 +195,7 @@ function CodePopover({ code, info, onClose, anchorRect }) {
  * @param {string} codes - Space-separated codes, e.g. "CO-45 PR-2 N781"
  * @param {object} style - Optional container style overrides
  */
-export default function ReasonCodeBadges({ codes, style }) {
+export default function ReasonCodeBadges({ codes, style, onViewClaims }) {
   const [active, setActive] = useState(null); // { code, info, rect }
 
   if (!codes) return null;
@@ -235,6 +267,7 @@ export default function ReasonCodeBadges({ codes, style }) {
           info={active.info}
           anchorRect={active.rect}
           onClose={() => setActive(null)}
+          onViewClaims={onViewClaims}
         />
       )}
     </div>

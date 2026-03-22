@@ -1,9 +1,76 @@
+import { useState } from "react";
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import ReasonCodeBadges from "./ReasonCodeBadges";
 import PatientWatch from "./PatientWatch";
+import Alerts from "./Alerts";
 
-export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) {
+function CollapsibleSection({ title, badge, badgeColor, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="card" style={{ marginBottom: 16, overflow: "hidden" }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 18px",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "inherit",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: "var(--text-muted)",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
+            {title}
+          </span>
+          {badge && (
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "2px 8px",
+                borderRadius: 12,
+                background: (badgeColor || "#5a6478") + "20",
+                color: badgeColor || "#5a6478",
+              }}
+            >
+              {badge}
+            </span>
+          )}
+        </div>
+        <span
+          style={{
+            fontSize: 14,
+            color: "var(--text-muted)",
+            transition: "transform 0.2s",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div style={{ padding: "0 18px 16px" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Dashboard({ claims, payers, onNavigate, onViewClaims, workLogEntries = [] }) {
   const stats = {
     total: claims.length,
     totalBilled: claims.reduce((s, c) => s + parseDollar(c.billed), 0),
@@ -270,9 +337,6 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) 
         </div>
       )}
 
-      {/* Patient Watch - recurring denials */}
-      <PatientWatch claims={claims} onViewPatient={onViewClaims} />
-
       {/* Per-payer table */}
       {payers.length > 0 && (
         <div className="card" style={{ padding: 18 }}>
@@ -365,6 +429,44 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) 
           </table>
         </div>
       )}
+
+      {/* Awaiting Response - collapsible */}
+      {(() => {
+        const awaiting = workLogEntries.filter(
+          (e) => e.status === "pending" && ["email_payer", "awaiting_info"].includes(e.action)
+        );
+        const overdue = workLogEntries.filter(
+          (e) => e.status === "pending" && e.followUpDate && new Date(e.followUpDate) < new Date()
+          && !["email_payer", "awaiting_info"].includes(e.action)
+        );
+        const total = awaiting.length + overdue.length;
+        if (total === 0) return null;
+        return (
+          <CollapsibleSection
+            title="Awaiting Response"
+            badge={`${total}`}
+            badgeColor="#eab308"
+          >
+            <Alerts entries={workLogEntries} onNavigate={onNavigate} />
+          </CollapsibleSection>
+        );
+      })()}
+
+      {/* Patient Watch - collapsible */}
+      {(() => {
+        const problemStatuses = ["denied", "pr_only", "adjusted"];
+        const problemCount = claims.filter((c) => problemStatuses.includes(c._status)).length;
+        if (problemCount === 0) return null;
+        return (
+          <CollapsibleSection
+            title="Patient Watch"
+            badge="Recurring Denials"
+            badgeColor="#ef4444"
+          >
+            <PatientWatch claims={claims} onViewPatient={onViewClaims} />
+          </CollapsibleSection>
+        );
+      })()}
     </>
   );
 }

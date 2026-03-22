@@ -57,7 +57,7 @@ export default function PatientWatch({ claims, onViewPatient }) {
   }
 
   return (
-    <div className="card" style={{ padding: 18, marginBottom: 16 }}>
+    <div>
       <div
         style={{
           display: "flex",
@@ -66,23 +66,9 @@ export default function PatientWatch({ claims, onViewPatient }) {
           marginBottom: 12,
         }}
       >
-        <div>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: "#ef4444",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              marginBottom: 2,
-            }}
-          >
-            Patient Watch
-          </div>
-          <div style={{ fontSize: 11, color: "#5a6478" }}>
-            {patients.length} patient{patients.length !== 1 ? "s" : ""} with
-            recurring denials · {formatDollar(totalAtRisk)} at risk
-          </div>
+        <div style={{ fontSize: 11, color: "#5a6478" }}>
+          {patients.length} patient{patients.length !== 1 ? "s" : ""} with
+          recurring denials · {formatDollar(totalAtRisk)} at risk
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <select

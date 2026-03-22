@@ -10,7 +10,6 @@ import FieldMapper from "./components/FieldMapper";
 import DetailModal from "./components/DetailModal";
 import WorkClaimModal from "./components/WorkClaimModal";
 import WorkLog from "./components/WorkLog";
-import Alerts from "./components/Alerts";
 
 export default function App() {
   const [claims, setClaims, clearClaims] = useClaims();
@@ -219,9 +218,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Alerts */}
-        <Alerts entries={workLog.entries} onNavigate={setTab} />
-
         {/* Tab content */}
         {tab === "dashboard" && (
           <Dashboard
@@ -229,6 +225,7 @@ export default function App() {
             payers={payers}
             onNavigate={setTab}
             onViewClaims={handleViewClaims}
+            workLogEntries={workLog.entries}
           />
         )}
         {tab === "claims" && (

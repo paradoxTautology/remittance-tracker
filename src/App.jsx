@@ -39,13 +39,121 @@ export default function App() {
   };
 
   // Import new claims and cross-reference against work log
-  const importClaims = (newClaims) => {
-    setClaims([...claims, ...newClaims]);
+  // Generate identity fingerprint (who is this claim for?)
+  const claimIdentity = (c) => {
+    const name = (c.patient || "").toLowerCase().replace(/[^a-z]/g, "");
+    const dos = (c.dos || "").trim();
+    const cpt = (c.cpt || "").trim();
+    const payer = (c.payer || "").toLowerCase().replace(/[^a-z]/g, "");
+    const acnt = (c.acnt || "").trim();
+    if (acnt) return `${name}|${dos}|${acnt}`;
+    return `${name}|${dos}|${cpt}|${payer}`;
+  };
 
-    // Cross-reference: check if any pending work log entries are now resolved
-    const resolved = workLog.crossReference(newClaims);
+  // Check if two claims have the same financial outcome
+  const sameOutcome = (a, b) => {
+    const paidA = parseFloat(a.prov_paid) || 0;
+    const paidB = parseFloat(b.prov_paid) || 0;
+    return paidA === paidB && a._status === b._status;
+  };
+
+  const importClaims = (newClaims) => {
+    // Index existing claims by identity
+    const existingMap = {};
+    claims.forEach((c, i) => {
+      const id = claimIdentity(c);
+      if (!existingMap[id]) existingMap[id] = [];
+      existingMap[id].push({ claim: c, index: i });
+    });
+
+    const added = [];       // brand new claims
+    const updated = [];     // same claim, different outcome (now paid)
+    let skipped = 0;        // exact duplicates
+    const updatedIndices = new Set();
+
+    const seenInBatch = new Set();
+
+    newClaims.forEach((incoming) => {
+      const id = claimIdentity(incoming);
+
+      // Dedup within the new batch
+      if (seenInBatch.has(id)) {
+        skipped++;
+        return;
+      }
+
+      const matches = existingMap[id];
+
+      if (!matches || matches.length === 0) {
+        // Brand new claim
+        added.push(incoming);
+        seenInBatch.add(id);
+        return;
+      }
+
+      // Check if outcome changed
+      const incomingPaid = parseFloat(incoming.prov_paid) || 0;
+      const existingClaim = matches[0].claim;
+      const existingPaid = parseFloat(existingClaim.prov_paid) || 0;
+
+      if (incomingPaid === existingPaid) {
+        // Exact duplicate — skip
+        skipped++;
+      } else {
+        // Updated outcome — replace the old claim
+        updated.push({
+          oldIndex: matches[0].index,
+          newClaim: incoming,
+          oldPaid: existingPaid,
+          newPaid: incomingPaid,
+        });
+        seenInBatch.add(id);
+      }
+    });
+
+    // Build the updated claims array
+    let updatedClaims = [...claims];
+
+    // Apply updates (replace old claims with new outcomes)
+    updated.forEach((u) => {
+      updatedClaims[u.oldIndex] = {
+        ...u.newClaim,
+        _id: updatedClaims[u.oldIndex]._id, // keep original ID
+        _imported: new Date().toISOString(),
+      };
+    });
+
+    // Add brand new claims
+    updatedClaims = [...updatedClaims, ...added];
+
+    setClaims(updatedClaims);
+
+    // Cross-reference work log: resolve entries where claims are now paid
+    const allNewAndUpdated = [
+      ...added,
+      ...updated.map((u) => u.newClaim),
+    ];
+    const resolved = workLog.crossReference(allNewAndUpdated);
+
+    // Build summary message
+    const parts = [];
+    if (added.length > 0) {
+      parts.push(`${added.length} new claim${added.length !== 1 ? "s" : ""} added`);
+    }
+    if (updated.length > 0) {
+      parts.push(`${updated.length} claim${updated.length !== 1 ? "s" : ""} updated with new payment`);
+    }
+    if (skipped > 0) {
+      parts.push(`${skipped} duplicate${skipped !== 1 ? "s" : ""} skipped`);
+    }
     if (resolved > 0) {
-      alert(`${resolved} previously worked claim${resolved > 1 ? "s" : ""} resolved with this import!`);
+      parts.push(`${resolved} worked claim${resolved !== 1 ? "s" : ""} auto-resolved`);
+    }
+
+    if (parts.length > 0) {
+      alert(parts.join(" · "));
+    } else {
+      alert("No changes — all claims already exist with the same data.");
     }
 
     setTab("claims");

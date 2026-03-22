@@ -77,7 +77,7 @@ export default function Alerts({ entries, onNavigate }) {
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#eab308",
+                color: "#c8aa64",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
               }}
@@ -103,17 +103,17 @@ export default function Alerts({ entries, onNavigate }) {
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#e8eaf0" }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#e8dfd0" }}>
                         {e.patient}
                       </div>
-                      <div style={{ fontSize: 11, color: "#8b95a8", marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: "#bfb5a3", marginTop: 2 }}>
                         {e.notes || "No notes"}
-                        <span style={{ color: "#5a6478" }}> · {days}d ago</span>
+                        <span style={{ color: "#7a7060" }}> · {days}d ago</span>
                         {followDays !== null && followDays <= 0 && (
-                          <span style={{ color: "#ef4444", fontWeight: 600 }}> · OVERDUE</span>
+                          <span style={{ color: "#c0785a", fontWeight: 600 }}> · OVERDUE</span>
                         )}
                         {followDays !== null && followDays > 0 && (
-                          <span style={{ color: "#5a6478" }}> · follow up in {followDays}d</span>
+                          <span style={{ color: "#7a7060" }}> · follow up in {followDays}d</span>
                         )}
                       </div>
                     </div>
@@ -126,9 +126,9 @@ export default function Alerts({ entries, onNavigate }) {
                       style={{
                         padding: "4px 10px",
                         borderRadius: 6,
-                        border: "1px solid rgba(234,179,8,0.3)",
-                        background: "rgba(234,179,8,0.1)",
-                        color: "#eab308",
+                        border: "1px solid rgba(200,170,100,0.3)",
+                        background: "rgba(200,170,100,0.1)",
+                        color: "#c8aa64",
                         cursor: "pointer",
                         fontSize: 10,
                         fontWeight: 600,
@@ -144,7 +144,7 @@ export default function Alerts({ entries, onNavigate }) {
                         borderRadius: 6,
                         border: "none",
                         background: "transparent",
-                        color: "#5a6478",
+                        color: "#7a7060",
                         cursor: "pointer",
                         fontSize: 12,
                         fontFamily: "inherit",
@@ -184,7 +184,7 @@ export default function Alerts({ entries, onNavigate }) {
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#ef4444",
+                color: "#c0785a",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
               }}
@@ -208,12 +208,12 @@ export default function Alerts({ entries, onNavigate }) {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#e8eaf0" }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#e8dfd0" }}>
                       {e.patient}
                     </div>
-                    <div style={{ fontSize: 11, color: "#8b95a8", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "#bfb5a3", marginTop: 2 }}>
                       Follow-up was {formatDate(e.followUpDate)}
-                      <span style={{ color: "#ef4444", fontWeight: 600 }}> · {overdueDays}d overdue</span>
+                      <span style={{ color: "#c0785a", fontWeight: 600 }}> · {overdueDays}d overdue</span>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
@@ -222,9 +222,9 @@ export default function Alerts({ entries, onNavigate }) {
                       style={{
                         padding: "4px 10px",
                         borderRadius: 6,
-                        border: "1px solid rgba(239,68,68,0.3)",
-                        background: "rgba(239,68,68,0.1)",
-                        color: "#ef4444",
+                        border: "1px solid rgba(192,120,90,0.3)",
+                        background: "rgba(192,120,90,0.1)",
+                        color: "#c0785a",
                         cursor: "pointer",
                         fontSize: 10,
                         fontWeight: 600,
@@ -240,7 +240,7 @@ export default function Alerts({ entries, onNavigate }) {
                         borderRadius: 6,
                         border: "none",
                         background: "transparent",
-                        color: "#5a6478",
+                        color: "#7a7060",
                         cursor: "pointer",
                         fontSize: 12,
                         fontFamily: "inherit",
@@ -280,7 +280,7 @@ export default function Alerts({ entries, onNavigate }) {
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#22c55e",
+                color: "#8aad72",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
               }}
@@ -302,10 +302,10 @@ export default function Alerts({ entries, onNavigate }) {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#e8eaf0" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#e8dfd0" }}>
                     {e.patient}
                   </div>
-                  <div style={{ fontSize: 11, color: "#22c55e", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: "#8aad72", marginTop: 2 }}>
                     Resolved {formatDate(e.resolvedDate)}
                     {e.resolvedPaid > 0 && ` · Paid $${e.resolvedPaid.toFixed(2)}`}
                   </div>
@@ -317,7 +317,7 @@ export default function Alerts({ entries, onNavigate }) {
                     borderRadius: 6,
                     border: "none",
                     background: "transparent",
-                    color: "#5a6478",
+                    color: "#7a7060",
                     cursor: "pointer",
                     fontSize: 12,
                     fontFamily: "inherit",

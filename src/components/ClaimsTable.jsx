@@ -42,15 +42,15 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
   }, [initialSearch]);
 
   const WORK_ACTIONS = {
-    appeal: { label: "Appealed", color: "#3b82f6", icon: "⟳" },
-    resubmit: { label: "Resubmitted", color: "#3b82f6", icon: "⟳" },
-    email_payer: { label: "Emailed", color: "#eab308", icon: "✉" },
-    awaiting_info: { label: "Awaiting", color: "#f59e0b", icon: "⏳" },
-    bill_patient: { label: "Billed Pt", color: "#f97316", icon: "$" },
-    contact_payer: { label: "Contacted", color: "#8b5cf6", icon: "✆" },
-    submit_secondary: { label: "Sent 2nd", color: "#a855f7", icon: "→" },
-    write_off: { label: "Written Off", color: "#6b7280", icon: "—" },
-    other: { label: "Worked", color: "#3b82f6", icon: "✎" },
+    appeal: { label: "Appealed", color: "#c2703e", icon: "⟳" },
+    resubmit: { label: "Resubmitted", color: "#c2703e", icon: "⟳" },
+    email_payer: { label: "Emailed", color: "#c8aa64", icon: "✉" },
+    awaiting_info: { label: "Awaiting", color: "#c8aa64", icon: "⏳" },
+    bill_patient: { label: "Billed Pt", color: "#c8aa64", icon: "$" },
+    contact_payer: { label: "Contacted", color: "#a888b0", icon: "✆" },
+    submit_secondary: { label: "Sent 2nd", color: "#a888b0", icon: "→" },
+    write_off: { label: "Written Off", color: "#7a7060", icon: "—" },
+    other: { label: "Worked", color: "#c2703e", icon: "✎" },
   };
 
   const getWorkStatus = (claim) => {
@@ -172,7 +172,7 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
             <button
               onClick={() => exportClaimsCSV(filtered)}
               className="fb"
-              style={{ borderColor: "rgba(34,197,94,0.3)", color: "var(--green)" }}
+              style={{ borderColor: "rgba(138,173,114,0.3)", color: "var(--green)" }}
             >
               Export CSV
             </button>

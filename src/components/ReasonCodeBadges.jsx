@@ -50,8 +50,8 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
           left: pos.left,
           zIndex: 999,
           width: 360,
-          background: "#1a1f2b",
-          border: "1px solid #2d3548",
+          background: "#2a2620",
+          border: "1px solid #342f28",
           borderRadius: 12,
           padding: 20,
           boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
@@ -75,7 +75,7 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
                 fontFamily: "var(--font-mono)",
                 fontSize: 15,
                 fontWeight: 700,
-                color: "#e8eaf0",
+                color: "#e8dfd0",
               }}
             >
               {code}
@@ -100,7 +100,7 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
             style={{
               background: "none",
               border: "none",
-              color: "#5a6478",
+              color: "#7a7060",
               cursor: "pointer",
               fontSize: 16,
               padding: "2px 6px",
@@ -115,11 +115,11 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
         <div
           style={{
             fontSize: 12,
-            color: "#c0c5d0",
+            color: "#bfb5a3",
             lineHeight: 1.6,
             marginBottom: 14,
             padding: 12,
-            background: "#151921",
+            background: "#221f1b",
             borderRadius: 8,
             borderLeft: `3px solid ${catColor}`,
           }}
@@ -133,7 +133,7 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: "#22c55e",
+              color: "#8aad72",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: 6,
@@ -144,7 +144,7 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
           <div
             style={{
               fontSize: 12,
-              color: "#c0c5d0",
+              color: "#bfb5a3",
               lineHeight: 1.6,
             }}
           >
@@ -164,9 +164,9 @@ function CodePopover({ code, info, onClose, anchorRect, onViewClaims }) {
               width: "100%",
               padding: "10px",
               borderRadius: 8,
-              border: "1px solid var(--accent, #3b82f6)",
+              border: "1px solid var(--accent)",
               background: "rgba(59, 130, 246, 0.1)",
-              color: "#3b82f6",
+              color: "#c2703e",
               cursor: "pointer",
               fontSize: 12,
               fontWeight: 600,
@@ -228,7 +228,7 @@ export default function ReasonCodeBadges({ codes, style, onViewClaims }) {
         const known = !!info;
         const catColor = known
           ? CATEGORY_COLORS[info.category] || "#8b95a8"
-          : "#5a6478";
+          : "#7a7060";
 
         return (
           <span
@@ -240,8 +240,8 @@ export default function ReasonCodeBadges({ codes, style, onViewClaims }) {
               fontWeight: 600,
               padding: "2px 7px",
               borderRadius: 6,
-              background: known ? catColor + "18" : "#252d3d",
-              color: known ? catColor : "#5a6478",
+              background: known ? catColor + "18" : "#342f28",
+              color: known ? catColor : "#7a7060",
               cursor: known ? "pointer" : "default",
               transition: "all 0.15s",
               whiteSpace: "nowrap",

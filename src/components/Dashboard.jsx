@@ -42,8 +42,8 @@ function CollapsibleSection({ title, badge, badgeColor, children, defaultOpen = 
                 fontWeight: 700,
                 padding: "2px 8px",
                 borderRadius: 12,
-                background: (badgeColor || "#5a6478") + "20",
-                color: badgeColor || "#5a6478",
+                background: (badgeColor || "#7a7060") + "20",
+                color: badgeColor || "#7a7060",
               }}
             >
               {badge}
@@ -445,7 +445,7 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims, wo
           <CollapsibleSection
             title="Awaiting Response"
             badge={`${total}`}
-            badgeColor="#eab308"
+            badgeColor="#c8aa64"
           >
             <Alerts entries={workLogEntries} onNavigate={onNavigate} />
           </CollapsibleSection>
@@ -461,7 +461,7 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims, wo
           <CollapsibleSection
             title="Patient Watch"
             badge="Recurring Denials"
-            badgeColor="#ef4444"
+            badgeColor="#c0785a"
           >
             <PatientWatch claims={claims} onViewPatient={onViewClaims} />
           </CollapsibleSection>

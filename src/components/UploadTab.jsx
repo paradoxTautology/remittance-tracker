@@ -200,8 +200,8 @@ export default function UploadTab({ claimCount, onFile, onClear, parsing }) {
             style={{
               padding: "8px 20px",
               borderRadius: 8,
-              border: "1px solid rgba(239,68,68,0.2)",
-              background: "rgba(239,68,68,0.07)",
+              border: "1px solid rgba(192,120,90,0.2)",
+              background: "rgba(192,120,90,0.07)",
               color: "var(--red)",
               cursor: "pointer",
               fontSize: 12,

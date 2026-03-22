@@ -53,22 +53,22 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
     >
       <div
         style={{
-          background: "#151921",
+          background: "#221f1b",
           borderRadius: 14,
           padding: 28,
           width: 480,
           maxHeight: "85vh",
           overflowY: "auto",
           boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
-          border: "1px solid #252d3d",
+          border: "1px solid #342f28",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#e8eaf0" }}>
+        <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#e8dfd0" }}>
           Work Claim
         </h3>
-        <p style={{ margin: "0 0 16px", fontSize: 12, color: "#5a6478" }}>
+        <p style={{ margin: "0 0 16px", fontSize: 12, color: "#7a7060" }}>
           Log the action you're taking on this denial
         </p>
 
@@ -76,7 +76,7 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
         <div
           style={{
             padding: 12,
-            background: "#1c2130",
+            background: "#2a2620",
             borderRadius: 8,
             marginBottom: 18,
             display: "grid",
@@ -95,8 +95,8 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
           ].map(([k, v]) =>
             v ? (
               <div key={k}>
-                <div style={{ fontSize: 9, fontWeight: 700, color: "#5a6478", textTransform: "uppercase", letterSpacing: "0.5px" }}>{k}</div>
-                <div style={{ fontSize: 12, color: "#e8eaf0", marginTop: 2 }}>{v}</div>
+                <div style={{ fontSize: 9, fontWeight: 700, color: "#7a7060", textTransform: "uppercase", letterSpacing: "0.5px" }}>{k}</div>
+                <div style={{ fontSize: 12, color: "#e8dfd0", marginTop: 2 }}>{v}</div>
               </div>
             ) : null
           )}
@@ -104,7 +104,7 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
 
         {/* Action selection */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, fontWeight: 700, color: "#8b95a8", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, color: "#bfb5a3", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
             Action Taken
           </label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
@@ -115,9 +115,9 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
                 style={{
                   padding: "10px 12px",
                   borderRadius: 8,
-                  border: `1px solid ${action === a.value ? "#3b82f6" : "#252d3d"}`,
-                  background: action === a.value ? "rgba(59,130,246,0.15)" : "#1c2130",
-                  color: action === a.value ? "#3b82f6" : "#8b95a8",
+                  border: `1px solid ${action === a.value ? "#c2703e" : "#342f28"}`,
+                  background: action === a.value ? "rgba(194,112,62,0.15)" : "#2a2620",
+                  color: action === a.value ? "#c2703e" : "#bfb5a3",
                   cursor: "pointer",
                   textAlign: "left",
                   fontFamily: "inherit",
@@ -125,7 +125,7 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
                 }}
               >
                 <div style={{ fontSize: 12, fontWeight: 600 }}>{a.label}</div>
-                <div style={{ fontSize: 10, color: "#5a6478", marginTop: 2 }}>{a.desc}</div>
+                <div style={{ fontSize: 10, color: "#7a7060", marginTop: 2 }}>{a.desc}</div>
               </button>
             ))}
           </div>
@@ -133,7 +133,7 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
 
         {/* Notes */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 11, fontWeight: 700, color: "#8b95a8", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, color: "#bfb5a3", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
             Notes
           </label>
           <select
@@ -147,9 +147,9 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               width: "100%",
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #252d3d",
-              background: "#1c2130",
-              color: "#8b95a8",
+              border: "1px solid #342f28",
+              background: "#2a2620",
+              color: "#bfb5a3",
               fontSize: 12,
               fontFamily: "inherit",
               marginBottom: 8,
@@ -210,9 +210,9 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               width: "100%",
               padding: "10px 12px",
               borderRadius: 8,
-              border: "1px solid #252d3d",
-              background: "#1c2130",
-              color: "#e8eaf0",
+              border: "1px solid #342f28",
+              background: "#2a2620",
+              color: "#e8dfd0",
               fontSize: 12,
               fontFamily: "inherit",
               resize: "vertical",
@@ -222,7 +222,7 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
 
         {/* Follow-up date */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 11, fontWeight: 700, color: "#8b95a8", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
+          <label style={{ fontSize: 11, fontWeight: 700, color: "#bfb5a3", textTransform: "uppercase", letterSpacing: "0.5px", display: "block", marginBottom: 6 }}>
             Follow-Up Date (optional)
           </label>
           <input
@@ -232,9 +232,9 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #252d3d",
-              background: "#1c2130",
-              color: "#e8eaf0",
+              border: "1px solid #342f28",
+              background: "#2a2620",
+              color: "#e8dfd0",
               fontSize: 12,
               fontFamily: "inherit",
             }}
@@ -249,9 +249,9 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               flex: 1,
               padding: "10px",
               borderRadius: 8,
-              border: "1px solid #252d3d",
+              border: "1px solid #342f28",
               background: "transparent",
-              color: "#8b95a8",
+              color: "#bfb5a3",
               cursor: "pointer",
               fontSize: 13,
               fontFamily: "inherit",
@@ -267,8 +267,8 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               padding: "10px",
               borderRadius: 8,
               border: "none",
-              background: action ? "#3b82f6" : "#252d3d",
-              color: action ? "#fff" : "#5a6478",
+              background: action ? "#c2703e" : "#342f28",
+              color: action ? "#fff" : "#7a7060",
               cursor: action ? "pointer" : "not-allowed",
               fontSize: 13,
               fontWeight: 600,

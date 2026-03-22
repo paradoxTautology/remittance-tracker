@@ -15,9 +15,9 @@ const ACTION_LABELS = {
 };
 
 const STATUS_CONFIG = {
-  pending: { label: "Pending", color: "#f59e0b", icon: "⏳" },
-  resolved: { label: "Resolved", color: "#22c55e", icon: "✓" },
-  written_off: { label: "Written Off", color: "#6b7280", icon: "—" },
+  pending: { label: "Pending", color: "#c8aa64", icon: "⏳" },
+  resolved: { label: "Resolved", color: "#8aad72", icon: "✓" },
+  written_off: { label: "Written Off", color: "#7a7060", icon: "—" },
 };
 
 function formatDate(iso) {
@@ -75,10 +75,10 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
     return (
       <div className="card" style={{ padding: 48, textAlign: "center" }}>
         <div style={{ fontSize: 32, marginBottom: 10 }}>📝</div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: "#e8eaf0", marginBottom: 5 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: "#e8dfd0", marginBottom: 5 }}>
           No worked claims yet
         </div>
-        <div style={{ fontSize: 12, color: "#5a6478" }}>
+        <div style={{ fontSize: 12, color: "#7a7060" }}>
           Go to Claims, click a claim, and hit "Work Claim" to start tracking denials
         </div>
       </div>
@@ -90,15 +90,15 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
         {[
-          { l: "Pending", v: stats.pending, s: formatDollar(stats.pendingAmt) + " at stake", c: "#f59e0b" },
-          { l: "Resolved", v: stats.resolved, s: formatDollar(stats.resolvedAmt) + " recovered", c: "#22c55e" },
-          { l: "Written Off", v: stats.writtenOff, s: "no further action", c: "#6b7280" },
-          { l: "Overdue Follow-Ups", v: stats.overdue, s: "need attention", c: stats.overdue > 0 ? "#ef4444" : "#5a6478" },
+          { l: "Pending", v: stats.pending, s: formatDollar(stats.pendingAmt) + " at stake", c: "#c8aa64" },
+          { l: "Resolved", v: stats.resolved, s: formatDollar(stats.resolvedAmt) + " recovered", c: "#8aad72" },
+          { l: "Written Off", v: stats.writtenOff, s: "no further action", c: "#7a7060" },
+          { l: "Overdue Follow-Ups", v: stats.overdue, s: "need attention", c: stats.overdue > 0 ? "#c0785a" : "#7a7060" },
         ].map((c) => (
           <div key={c.l} className="card" style={{ padding: 16, borderLeft: `3px solid ${c.c}` }}>
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", color: "#5a6478", marginBottom: 4 }}>{c.l}</div>
-            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#e8eaf0" }}>{c.v}</div>
-            <div style={{ fontSize: 11, color: "#8b95a8", marginTop: 2 }}>{c.s}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", color: "#7a7060", marginBottom: 4 }}>{c.l}</div>
+            <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: "#e8dfd0" }}>{c.v}</div>
+            <div style={{ fontSize: 11, color: "#bfb5a3", marginTop: 2 }}>{c.s}</div>
           </div>
         ))}
       </div>
@@ -112,9 +112,9 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
           style={{
             padding: "7px 12px",
             borderRadius: 8,
-            border: "1px solid #252d3d",
-            background: "#1c2130",
-            color: "#e8eaf0",
+            border: "1px solid #342f28",
+            background: "#2a2620",
+            color: "#e8dfd0",
             fontSize: 12,
             width: 260,
             fontFamily: "inherit",
@@ -136,7 +136,7 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
             </button>
           ))}
         </div>
-        <span style={{ marginLeft: "auto", fontSize: 11, color: "#5a6478" }}>
+        <span style={{ marginLeft: "auto", fontSize: 11, color: "#7a7060" }}>
           {filtered.length} entries
         </span>
       </div>
@@ -164,7 +164,7 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#e8eaf0" }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#e8dfd0" }}>
                       {entry.patient}
                     </span>
                     <span
@@ -186,15 +186,15 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
                           fontWeight: 700,
                           padding: "2px 8px",
                           borderRadius: 12,
-                          background: "rgba(239,68,68,0.15)",
-                          color: "#ef4444",
+                          background: "rgba(192,120,90,0.15)",
+                          color: "#c0785a",
                         }}
                       >
                         OVERDUE
                       </span>
                     )}
                   </div>
-                  <div style={{ display: "flex", gap: 16, fontSize: 11, color: "#8b95a8" }}>
+                  <div style={{ display: "flex", gap: 16, fontSize: 11, color: "#bfb5a3" }}>
                     <span>{entry.dos}</span>
                     {entry.cpt && <span className="mono">{entry.cpt}</span>}
                     <span>{entry.payer}</span>
@@ -208,9 +208,9 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
                       style={{
                         padding: "4px 10px",
                         borderRadius: 6,
-                        border: "1px solid rgba(34,197,94,0.3)",
-                        background: "rgba(34,197,94,0.1)",
-                        color: "#22c55e",
+                        border: "1px solid rgba(138,173,114,0.3)",
+                        background: "rgba(138,173,114,0.1)",
+                        color: "#8aad72",
                         cursor: "pointer",
                         fontSize: 10,
                         fontWeight: 600,
@@ -225,9 +225,9 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
                     style={{
                       padding: "4px 8px",
                       borderRadius: 6,
-                      border: "1px solid rgba(239,68,68,0.2)",
+                      border: "1px solid rgba(192,120,90,0.2)",
                       background: "transparent",
-                      color: "#5a6478",
+                      color: "#7a7060",
                       cursor: "pointer",
                       fontSize: 10,
                       fontFamily: "inherit",
@@ -246,35 +246,35 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
                     fontWeight: 700,
                     padding: "2px 8px",
                     borderRadius: 6,
-                    background: "#1c2130",
-                    border: "1px solid #252d3d",
-                    color: "#8b95a8",
+                    background: "#2a2620",
+                    border: "1px solid #342f28",
+                    color: "#bfb5a3",
                     textTransform: "uppercase",
                   }}
                 >
                   {ACTION_LABELS[entry.action] || entry.action}
                 </span>
                 <ReasonCodeBadges codes={entry.reason_codes} onViewClaims={onViewClaims} />
-                <span style={{ fontSize: 10, color: "#5a6478", marginLeft: "auto" }}>
+                <span style={{ fontSize: 10, color: "#7a7060", marginLeft: "auto" }}>
                   Worked {formatDate(entry.workedDate)}
                   {days !== null && ` (${days}d ago)`}
                 </span>
               </div>
 
               {entry.notes && (
-                <div style={{ fontSize: 11, color: "#8b95a8", marginTop: 4, lineHeight: 1.5, paddingLeft: 2 }}>
+                <div style={{ fontSize: 11, color: "#bfb5a3", marginTop: 4, lineHeight: 1.5, paddingLeft: 2 }}>
                   {entry.notes}
                 </div>
               )}
 
               {entry.followUpDate && entry.status === "pending" && (
-                <div style={{ fontSize: 10, color: isOverdue ? "#ef4444" : "#5a6478", marginTop: 4 }}>
+                <div style={{ fontSize: 10, color: isOverdue ? "#c0785a" : "#7a7060", marginTop: 4 }}>
                   Follow-up: {formatDate(entry.followUpDate)}
                 </div>
               )}
 
               {entry.status === "resolved" && entry.resolvedPaid > 0 && (
-                <div style={{ fontSize: 11, color: "#22c55e", marginTop: 4, fontWeight: 600 }}>
+                <div style={{ fontSize: 11, color: "#8aad72", marginTop: 4, fontWeight: 600 }}>
                   Paid {formatDollar(entry.resolvedPaid)} on {formatDate(entry.resolvedDate)}
                 </div>
               )}
@@ -293,9 +293,9 @@ export default function WorkLog({ entries, onUpdateEntry, onRemoveEntry, onClear
             style={{
               padding: "8px 20px",
               borderRadius: 8,
-              border: "1px solid rgba(239,68,68,0.2)",
-              background: "rgba(239,68,68,0.07)",
-              color: "#ef4444",
+              border: "1px solid rgba(192,120,90,0.2)",
+              background: "rgba(192,120,90,0.07)",
+              color: "#c0785a",
               cursor: "pointer",
               fontSize: 12,
               fontWeight: 600,

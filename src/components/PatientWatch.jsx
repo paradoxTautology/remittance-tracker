@@ -66,7 +66,7 @@ export default function PatientWatch({ claims, onViewPatient }) {
           marginBottom: 12,
         }}
       >
-        <div style={{ fontSize: 11, color: "#5a6478" }}>
+        <div style={{ fontSize: 11, color: "#7a7060" }}>
           {patients.length} patient{patients.length !== 1 ? "s" : ""} with
           recurring denials · {formatDollar(totalAtRisk)} at risk
         </div>
@@ -77,9 +77,9 @@ export default function PatientWatch({ claims, onViewPatient }) {
             style={{
               padding: "4px 8px",
               borderRadius: 6,
-              border: "1px solid #252d3d",
-              background: "#1c2130",
-              color: "#8b95a8",
+              border: "1px solid #342f28",
+              background: "#2a2620",
+              color: "#bfb5a3",
               fontSize: 11,
               fontFamily: "inherit",
             }}
@@ -94,9 +94,9 @@ export default function PatientWatch({ claims, onViewPatient }) {
             style={{
               padding: "4px 8px",
               borderRadius: 6,
-              border: "1px solid #252d3d",
-              background: "#1c2130",
-              color: "#8b95a8",
+              border: "1px solid #342f28",
+              background: "#2a2620",
+              color: "#bfb5a3",
               fontSize: 11,
               fontFamily: "inherit",
             }}
@@ -109,7 +109,7 @@ export default function PatientWatch({ claims, onViewPatient }) {
       </div>
 
       {patients.length === 0 ? (
-        <div style={{ padding: 16, textAlign: "center", fontSize: 12, color: "#5a6478" }}>
+        <div style={{ padding: 16, textAlign: "center", fontSize: 12, color: "#7a7060" }}>
           No patients with {minClaims}+ denied claims
         </div>
       ) : (
@@ -127,18 +127,18 @@ export default function PatientWatch({ claims, onViewPatient }) {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "10px 14px",
-                  background: "#1c2130",
+                  background: "#2a2620",
                   borderRadius: 8,
-                  borderLeft: `3px solid ${p.claims.length >= 5 ? "#ef4444" : p.claims.length >= 3 ? "#f59e0b" : "#5a6478"}`,
+                  borderLeft: `3px solid ${p.claims.length >= 5 ? "#c0785a" : p.claims.length >= 3 ? "#c8aa64" : "#7a7060"}`,
                   cursor: "pointer",
                   transition: "background 0.15s",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "#252d3d"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "#1c2130"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#342f28"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#2a2620"; }}
               >
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#e8eaf0" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#e8dfd0" }}>
                       {p.name}
                     </span>
                     <span
@@ -148,41 +148,41 @@ export default function PatientWatch({ claims, onViewPatient }) {
                         padding: "2px 8px",
                         borderRadius: 12,
                         background: p.claims.length >= 5
-                          ? "rgba(239,68,68,0.15)"
+                          ? "rgba(192,120,90,0.15)"
                           : p.claims.length >= 3
-                          ? "rgba(245,158,11,0.15)"
-                          : "rgba(90,100,120,0.15)",
+                          ? "rgba(200,170,100,0.15)"
+                          : "rgba(122,112,96,0.15)",
                         color: p.claims.length >= 5
-                          ? "#ef4444"
+                          ? "#c0785a"
                           : p.claims.length >= 3
-                          ? "#f59e0b"
-                          : "#5a6478",
+                          ? "#c8aa64"
+                          : "#7a7060",
                       }}
                     >
                       {p.claims.length} denied
                     </span>
                   </div>
-                  <div style={{ display: "flex", gap: 12, fontSize: 11, color: "#5a6478", marginTop: 4 }}>
-                    <span className="mono" style={{ color: "#ef4444" }}>
+                  <div style={{ display: "flex", gap: 12, fontSize: 11, color: "#7a7060", marginTop: 4 }}>
+                    <span className="mono" style={{ color: "#c0785a" }}>
                       {formatDollar(p.totalBilled)}
                     </span>
                     <span>{[...p.payers].join(", ")}</span>
                     {topCode && (
                       <span>
-                        Top: <span className="mono" style={{ color: "#f59e0b" }}>{topCode[0]}</span> ×{topCode[1]}
+                        Top: <span className="mono" style={{ color: "#c8aa64" }}>{topCode[0]}</span> ×{topCode[1]}
                       </span>
                     )}
                     <span>{p.dateRange.earliest} — {p.dateRange.latest}</span>
                   </div>
                 </div>
-                <span style={{ fontSize: 11, color: "#3b82f6", fontWeight: 600 }}>
+                <span style={{ fontSize: 11, color: "#c2703e", fontWeight: 600 }}>
                   View →
                 </span>
               </div>
             );
           })}
           {patients.length > 20 && (
-            <div style={{ textAlign: "center", fontSize: 11, color: "#5a6478", padding: 8 }}>
+            <div style={{ textAlign: "center", fontSize: 11, color: "#7a7060", padding: 8 }}>
               Showing top 20 of {patients.length} patients
             </div>
           )}

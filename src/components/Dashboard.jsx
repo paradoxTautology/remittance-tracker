@@ -1,6 +1,7 @@
 import { STATUS_MAP } from "../utils/status";
 import { parseDollar, formatDollar } from "../utils/format";
 import ReasonCodeBadges from "./ReasonCodeBadges";
+import PatientWatch from "./PatientWatch";
 
 export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) {
   const stats = {
@@ -268,6 +269,9 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims }) 
           </div>
         </div>
       )}
+
+      {/* Patient Watch - recurring denials */}
+      <PatientWatch claims={claims} onViewPatient={onViewClaims} />
 
       {/* Per-payer table */}
       {payers.length > 0 && (

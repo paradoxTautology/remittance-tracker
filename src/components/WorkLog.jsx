@@ -15,9 +15,9 @@ const ACTION_LABELS = {
 };
 
 const STATUS_CONFIG = {
-  pending: { label: "Pending", color: "#c8aa64", icon: "⏳" },
-  resolved: { label: "Resolved", color: "#8aad72", icon: "✓" },
-  written_off: { label: "Written Off", color: "#7a7060", icon: "—" },
+  pending: { label: "Pending", color: "#d4a838", icon: "⏳" },
+  resolved: { label: "Resolved", color: "#6db856", icon: "✓" },
+  written_off: { label: "Written Off", color: "#8a8078", icon: "—" },
 };
 
 function formatDate(iso) {

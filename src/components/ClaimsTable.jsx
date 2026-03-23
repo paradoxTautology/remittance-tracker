@@ -42,14 +42,14 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
   }, [initialSearch]);
 
   const WORK_ACTIONS = {
-    appeal: { label: "Appealed", color: "#c2703e", icon: "⟳" },
-    resubmit: { label: "Resubmitted", color: "#c2703e", icon: "⟳" },
-    email_payer: { label: "Emailed", color: "#c8aa64", icon: "✉" },
-    awaiting_info: { label: "Awaiting", color: "#c8aa64", icon: "⏳" },
-    bill_patient: { label: "Billed Pt", color: "#c8aa64", icon: "$" },
-    contact_payer: { label: "Contacted", color: "#a888b0", icon: "✆" },
-    submit_secondary: { label: "Sent 2nd", color: "#a888b0", icon: "→" },
-    write_off: { label: "Written Off", color: "#7a7060", icon: "—" },
+    appeal: { label: "Appealed", color: "#e8963a", icon: "⟳" },
+    resubmit: { label: "Resubmitted", color: "#4db8a0", icon: "⟳" },
+    email_payer: { label: "Emailed", color: "#d4a838", icon: "✉" },
+    awaiting_info: { label: "Awaiting", color: "#d4a838", icon: "⏳" },
+    bill_patient: { label: "Billed Pt", color: "#c87c5a", icon: "$" },
+    contact_payer: { label: "Contacted", color: "#b07cc8", icon: "✆" },
+    submit_secondary: { label: "Sent 2nd", color: "#5b9bd5", icon: "→" },
+    write_off: { label: "Written Off", color: "#8a8078", icon: "—" },
     other: { label: "Worked", color: "#c2703e", icon: "✎" },
   };
 

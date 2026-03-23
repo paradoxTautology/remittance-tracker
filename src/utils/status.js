@@ -1,12 +1,12 @@
 import { parseDollar } from "./format";
 
 export const STATUS_MAP = {
-  paid: { label: "Paid", color: "#8aad72", icon: "✓" },
-  partial: { label: "Partial", color: "#96a8c0", icon: "◐" },
-  denied: { label: "Denied", color: "#c0785a", icon: "✗" },
-  forwarded: { label: "Forwarded", color: "#a888b0", icon: "→" },
-  reversed: { label: "Reversed", color: "#7a7060", icon: "↺" },
-  pr_only: { label: "Pt Resp", color: "#c8aa64", icon: "!" },
+  paid: { label: "Paid", color: "#6db856", icon: "✓" },
+  partial: { label: "Partial", color: "#5b9bd5", icon: "◐" },
+  denied: { label: "Denied", color: "#d4604a", icon: "✗" },
+  forwarded: { label: "Forwarded", color: "#b07cc8", icon: "→" },
+  reversed: { label: "Reversed", color: "#8a8078", icon: "↺" },
+  pr_only: { label: "Pt Resp", color: "#d4a838", icon: "!" },
   adjusted: { label: "Adjusted", color: "#c2703e", icon: "~" },
 };
 

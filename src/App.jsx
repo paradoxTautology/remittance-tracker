@@ -10,6 +10,7 @@ import FieldMapper from "./components/FieldMapper";
 import DetailModal from "./components/DetailModal";
 import WorkClaimModal from "./components/WorkClaimModal";
 import WorkLog from "./components/WorkLog";
+import PatientLedger from "./components/PatientLedger";
 
 export default function App() {
   const [claims, setClaims, clearClaims] = useClaims();
@@ -241,6 +242,7 @@ export default function App() {
   const TAB_LABELS = {
     dashboard: "Dashboard",
     claims: "Claims",
+    patients: "Patients",
     worklog: pendingCount > 0 ? `Work Log (${pendingCount})` : "Work Log",
     upload: "Upload",
   };
@@ -311,7 +313,7 @@ export default function App() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
-            {["dashboard", "claims", "worklog", "upload"].map((t) => (
+            {["dashboard", "claims", "patients", "worklog", "upload"].map((t) => (
               <button
                 key={t}
                 className={`tab ${tab === t ? "tab-on" : "tab-off"}`}
@@ -343,6 +345,14 @@ export default function App() {
             onSelectClaim={setDetail}
             initialSearch={claimsSearch}
             workLogEntries={workLog.entries}
+          />
+        )}
+        {tab === "patients" && (
+          <PatientLedger
+            claims={claims}
+            workLogEntries={workLog.entries}
+            onViewClaims={handleViewClaims}
+            onSelectClaim={setDetail}
           />
         )}
         {tab === "worklog" && (

@@ -51,8 +51,12 @@ export function useWorkLog() {
           ...entry,
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
           workedDate: new Date().toISOString(),
-          status: entry.action === "write_off" ? "written_off" : "pending",
-          resolvedDate: "",
+          status: entry.action === "write_off"
+            ? "written_off"
+            : entry.action === "paid_resolved"
+            ? "resolved"
+            : "pending",
+          resolvedDate: entry.action === "paid_resolved" ? new Date().toISOString() : "",
           resolvedPaid: 0,
         },
       ];

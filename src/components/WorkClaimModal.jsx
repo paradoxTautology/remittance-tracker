@@ -2,11 +2,14 @@ import { useState } from "react";
 import { formatDollar } from "../utils/format";
 
 const ACTIONS = [
-  { value: "appeal", label: "Appeal", desc: "Submitting formal appeal to payer" },
   { value: "resubmit", label: "Resubmit", desc: "Correcting and resubmitting claim" },
+  { value: "appeal", label: "Appeal", desc: "Submitting formal appeal to payer" },
   { value: "email_payer", label: "Email Payer", desc: "Emailed insurance for info or resolution" },
   { value: "awaiting_info", label: "Awaiting Info", desc: "Waiting on response from payer or patient" },
   { value: "contact_payer", label: "Contact Payer", desc: "Calling/writing payer for resolution" },
+  { value: "response_received", label: "Response Received", desc: "Got info back from payer or patient" },
+  { value: "denied_again", label: "Denied Again", desc: "Claim was reprocessed and denied again" },
+  { value: "paid_resolved", label: "Paid / Resolved", desc: "Claim has been paid or issue resolved" },
   { value: "bill_patient", label: "Bill Patient", desc: "Sending patient statement" },
   { value: "submit_secondary", label: "Submit to Secondary", desc: "Filing with secondary insurance" },
   { value: "write_off", label: "Write Off", desc: "No further action — absorb cost" },
@@ -194,6 +197,17 @@ export default function WorkClaimModal({ claim, onSubmit, onClose }) {
               <option value="Awaiting response from insurance — follow up in 7 days">Awaiting response — follow up in 7 days</option>
               <option value="Awaiting response from insurance — follow up in 14 days">Awaiting response — follow up in 14 days</option>
               <option value="Awaiting patient response — new insurance info needed">Awaiting patient — new insurance info needed</option>
+            </optgroup>
+            <optgroup label="Claim Updates">
+              <option value="Response received — policy number obtained">Response received — policy number obtained</option>
+              <option value="Response received — member ID corrected">Response received — member ID corrected</option>
+              <option value="Response received — COB updated">Response received — COB updated</option>
+              <option value="Denied again — same reason code">Denied again — same reason code</option>
+              <option value="Denied again — different reason code">Denied again — different reason code</option>
+              <option value="Denied again — escalating to supervisor">Denied again — escalating to supervisor</option>
+              <option value="Claim paid — confirmed in system">Claim paid — confirmed in system</option>
+              <option value="Claim paid — partial payment received">Claim paid — partial payment received</option>
+              <option value="Issue resolved — no payment expected">Issue resolved — no payment expected</option>
             </optgroup>
             <optgroup label="Write-Off">
               <option value="Capitation — no action required">Capitation — no action required</option>

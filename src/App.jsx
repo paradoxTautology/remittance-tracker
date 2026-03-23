@@ -24,14 +24,16 @@ export default function App() {
 
   const payers = [...new Set(claims.map((c) => c.payer).filter(Boolean))].sort();
 
-  // Check if a claim has been worked
-  const isClaimWorked = (claim) => {
-    return workLog.entries.some(
-      (e) =>
-        e.patient === claim.patient &&
-        e.dos === claim.dos &&
-        e.cpt === claim.cpt
-    );
+  // Get full work history for a claim
+  const getClaimHistory = (claim) => {
+    return workLog.entries
+      .filter(
+        (e) =>
+          e.patient === claim.patient &&
+          e.dos === claim.dos &&
+          ((!e.cpt && !claim.cpt) || e.cpt === claim.cpt)
+      )
+      .sort((a, b) => new Date(a.workedDate) - new Date(b.workedDate));
   };
 
   const handleViewClaims = (code) => {
@@ -264,16 +266,7 @@ export default function App() {
             setDetail(null);
             setWorkTarget(c);
           }}
-          isWorked={detail ? isClaimWorked(detail) : false}
-          onUnwork={(c) => {
-            const entry = workLog.entries.find(
-              (e) =>
-                e.patient === c.patient &&
-                e.dos === c.dos &&
-                e.cpt === c.cpt
-            );
-            if (entry) workLog.removeEntry(entry.id);
-          }}
+          history={detail ? getClaimHistory(detail) : []}
         />
       )}
       {workTarget && (

@@ -46,6 +46,9 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
     resubmit: { label: "Resubmitted", color: "#4db8a0", icon: "⟳" },
     email_payer: { label: "Emailed", color: "#d4a838", icon: "✉" },
     awaiting_info: { label: "Awaiting", color: "#d4a838", icon: "⏳" },
+    response_received: { label: "Response", color: "#5b9bd5", icon: "📩" },
+    denied_again: { label: "Denied Again", color: "#d4604a", icon: "✗" },
+    paid_resolved: { label: "Resolved", color: "#6db856", icon: "✓" },
     bill_patient: { label: "Billed Pt", color: "#c87c5a", icon: "$" },
     contact_payer: { label: "Contacted", color: "#b07cc8", icon: "✆" },
     submit_secondary: { label: "Sent 2nd", color: "#5b9bd5", icon: "→" },
@@ -54,15 +57,32 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
   };
 
   const getWorkStatus = (claim) => {
-    const entry = workLogEntries.find(
-      (e) =>
-        e.patient === claim.patient &&
-        e.dos === claim.dos &&
-        e.cpt === claim.cpt &&
-        e.status !== "resolved"
-    );
-    if (!entry) return null;
-    return WORK_ACTIONS[entry.action] || WORK_ACTIONS.other;
+    const entries = workLogEntries
+      .filter(
+        (e) =>
+          e.patient === claim.patient &&
+          e.dos === claim.dos &&
+          ((!e.cpt && !claim.cpt) || e.cpt === claim.cpt)
+      )
+      .sort((a, b) => new Date(b.workedDate) - new Date(a.workedDate));
+
+    if (!entries.length) return null;
+
+    const latest = entries[0];
+
+    // If resolved, show resolved status
+    if (latest.status === "resolved") {
+      return { label: "Resolved", color: "#6db856", icon: "✓" };
+    }
+
+    const action = WORK_ACTIONS[latest.action] || WORK_ACTIONS.other;
+
+    // Add history count indicator if multiple entries
+    if (entries.length > 1) {
+      return { ...action, label: `${action.label} (${entries.length})` };
+    }
+
+    return action;
   };
 
   const toggleSort = (col) => {

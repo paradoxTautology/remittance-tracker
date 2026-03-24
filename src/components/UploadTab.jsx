@@ -86,7 +86,7 @@ export default function UploadTab({ claimCount, onFile, onClear, parsing }) {
 
         <input
           type="file"
-          accept=".csv,.pdf"
+          accept=".csv,.pdf,.xlsx,.xls"
           ref={fileRef}
           onChange={(e) => {
             if (e.target.files[0]) onFile(e.target.files[0]);

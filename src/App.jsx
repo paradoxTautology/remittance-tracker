@@ -164,6 +164,7 @@ export default function App() {
 
   const handleFile = async (file) => {
     const isPDF = file.name.toLowerCase().endsWith(".pdf");
+    const isExcel = file.name.match(/\.xlsx?$/i);
 
     if (isPDF) {
       setParsing(true);
@@ -195,6 +196,35 @@ export default function App() {
       } catch (err) {
         console.error("PDF parse error:", err);
         alert("Failed to parse PDF: " + err.message);
+      }
+      setParsing(false);
+    } else if (isExcel) {
+      setParsing(true);
+      try {
+        const { parseExcel } = await import("./utils/excelParser.js");
+        const parsed = await parseExcel(file);
+
+        const enriched = parsed.map((c, i) => ({
+          patient: c.patientName,
+          memberId: c.memberId,
+          acnt: c.accountNumber,
+          dos: c.dos,
+          payer: c.payer,
+          billed: c.billed,
+          allowed: c.allowed,
+          prov_paid: c.paid,
+          denial_code: c.denialCode,
+          reason_codes: c.reasonCode || (c.status.includes("RTP") ? "RTP" : c.status),
+          reasonCode: c.reasonCode,
+          _id: Date.now() + i + Math.random(),
+          _status: deriveStatus({ prov_paid: c.paid, denial_code: c.denialCode }),
+          _imported: new Date().toISOString(),
+        }));
+
+        importClaims(enriched);
+      } catch (err) {
+        console.error("Excel parse error:", err);
+        alert("Failed to parse Excel: " + err.message);
       }
       setParsing(false);
     } else {

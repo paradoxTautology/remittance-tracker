@@ -237,6 +237,20 @@ const REASON_CODES = {
     category: "Overpayment",
     fix: "The payer overpaid on a previous claim and is recouping. Verify the recoupment is correct by reviewing the original claim. If incorrect, appeal the recoupment.",
   },
+  "RTP": {
+    code: "RTP",
+    group: "RTP",
+    description: "Return to Provider — claim rejected due to missing or invalid information. The member is not delegated to the payer on the date of service.",
+    category: "Eligibility",
+    fix: "Contact the health plan to verify member enrollment and delegation status on the DOS. If the member was delegated, submit proof of enrollment. If not, resubmit to the correct payer.",
+  },
+  "177": {
+    code: "177",
+    group: "CARC",
+    description: "Patient has not met the required eligibility requirements.",
+    category: "Eligibility",
+    fix: "Verify patient eligibility for the date of service. Check if coverage was active and if prior authorization was required. If eligibility was valid, submit documentation to the payer with proof of coverage and appeal.",
+  },
 };
 
 // --- Remark Codes (N-codes) ---

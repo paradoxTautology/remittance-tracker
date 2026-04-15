@@ -1,5 +1,12 @@
 import * as pdfjsLib from "pdfjs-dist";
 
+// Polyfill: Electron may lack Uint8Array.toHex
+if (!Uint8Array.prototype.toHex) {
+  Uint8Array.prototype.toHex = function () {
+    return Array.from(this).map((b) => b.toString(16).padStart(2, "0")).join("");
+  };
+}
+
 // Use bundled worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.mjs",

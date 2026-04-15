@@ -331,3 +331,49 @@ export const CATEGORY_COLORS = {
   "Benefit Maximum": "#c8aa64",
   "Overpayment": "#c0785a",
 };
+
+// --- WellMed / Payer-Specific Codes ---
+// These appear on WellMed QuicRemit EOBs and map to standard ANSI equivalents
+
+REASON_CODES["WM-301"] = {
+  code: "WM-301",
+  group: "WM",
+  description: "Charges applied to deductible.",
+  category: "Deductible",
+  fix: "Patient owes this amount toward their annual deductible. Bill the patient directly. Equivalent to PR-1.",
+};
+REASON_CODES["WM-302"] = {
+  code: "WM-302",
+  group: "WM",
+  description: "Copayment is member responsibility.",
+  category: "Copay",
+  fix: "Collect the copay amount from the patient. Equivalent to PR-3.",
+};
+REASON_CODES["WM-303"] = {
+  code: "WM-303",
+  group: "WM",
+  description: "Coinsurance is member responsibility.",
+  category: "Coinsurance",
+  fix: "Bill the patient for their coinsurance portion. Equivalent to PR-2.",
+};
+REASON_CODES["WM-314"] = {
+  code: "WM-314",
+  group: "WM",
+  description: "Sequestration reduction - CMS mandate per Budget Control Act 2011.",
+  category: "Sequestration",
+  fix: "Standard 2% Medicare sequestration reduction. No action needed — this is a mandatory federal adjustment. Equivalent to CO-253.",
+};
+REASON_CODES["WM-391"] = {
+  code: "WM-391",
+  group: "WM",
+  description: "Payment is fee schedule based.",
+  category: "Contractual Adjustment",
+  fix: "Standard contractual write-off — difference between billed and allowed amount per your fee schedule agreement. No action needed unless the allowed amount seems wrong. Equivalent to CO-45.",
+};
+REASON_CODES["WM-852"] = {
+  code: "WM-852",
+  group: "WM",
+  description: "Denied based on claims editing — possible duplicate procedure code on same date by same provider.",
+  category: "Duplicate/Editing",
+  fix: "WellMed flagged this as a potential duplicate. Check if a matching claim was already paid on another remittance. If not a duplicate, appeal with documentation showing services were distinct (different times, separate encounters).",
+};

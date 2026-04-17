@@ -323,7 +323,7 @@ export default function App() {
             <h1
               style={{ fontSize: 21, fontWeight: 700, letterSpacing: "-0.3px" }}
             >
-              Remittance Tracker
+              One Stop BS Shop
             </h1>
             <p
               style={{

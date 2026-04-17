@@ -8,10 +8,8 @@ if (!Uint8Array.prototype.toHex) {
 }
 
 // Use bundled worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.mjs",
-  import.meta.url
-).toString();
+// Use custom worker with polyfill
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url).toString();
 
 // --- Regex patterns ---
 

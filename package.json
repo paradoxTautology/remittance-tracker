@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.paradoxtautology.remittance-tracker",
-    "productName": "Remittance Tracker",
+    "productName": "One Stop BS Shop",
     "directories": {
       "output": "release"
     },
@@ -34,7 +34,7 @@
       ]
     },
     "dmg": {
-      "title": "Remittance Tracker",
+      "title": "One Stop BS Shop",
       "icon": "build/icon.png"
     }
   },

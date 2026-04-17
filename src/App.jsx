@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useClaims } from "./hooks/useClaims";
 import { useWorkLog } from "./hooks/useWorkLog";
+import { useTodos } from "./hooks/useTodos";
 import { parseCSV } from "./utils/csv";
 import { deriveStatus } from "./utils/status";
 import Dashboard from "./components/Dashboard";
@@ -15,7 +16,9 @@ import PatientLedger from "./components/PatientLedger";
 export default function App() {
   const [claims, setClaims, clearClaims] = useClaims();
   const workLog = useWorkLog();
+  const todoStore = useTodos();
   const [tab, setTab] = useState("dashboard");
+  const [remitTab, setRemitTab] = useState("remit-dash");
   const [mapper, setMapper] = useState(null);
   const [detail, setDetail] = useState(null);
   const [workTarget, setWorkTarget] = useState(null); // claim to work
@@ -271,8 +274,20 @@ export default function App() {
 
   const pendingCount = workLog.entries.filter((e) => e.status === "pending").length;
 
-  const TAB_LABELS = {
+  const TOP_TABS = {
     dashboard: "Dashboard",
+    remittance: "Remittance Tracker",
+  };
+  const REMIT_TABS = {
+    "remit-dash": "Dashboard",
+    claims: "Claims",
+    patients: "Patients",
+    worklog: pendingCount > 0 ? `Work Log (${pendingCount})` : "Work Log",
+    upload: "Upload",
+  };
+  const _unused_TAB_LABELS = {
+    dashboard: "Dashboard",
+    remittance: "Remittance",
     claims: "Claims",
     patients: "Patients",
     worklog: pendingCount > 0 ? `Work Log (${pendingCount})` : "Work Log",
@@ -336,7 +351,7 @@ export default function App() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
-            {["dashboard", "claims", "patients", "worklog", "upload"].map((t) => (
+            {Object.keys(TOP_TABS).map((t) => (
               <button
                 key={t}
                 className={`tab ${tab === t ? "tab-on" : "tab-off"}`}
@@ -345,7 +360,7 @@ export default function App() {
                   setTab(t);
                 }}
               >
-                {TAB_LABELS[t]}
+                {TOP_TABS[t]}
               </button>
             ))}
           </div>
@@ -356,44 +371,75 @@ export default function App() {
           <Dashboard
             claims={claims}
             payers={payers}
-            onNavigate={setTab}
+            onNavigate={(t) => { if (["claims","patients","worklog","upload","remit-dash"].includes(t)) { setTab("remittance"); setRemitTab(t === "remit-dash" ? "remit-dash" : t); } else { setTab(t); } }}
             onViewClaims={handleViewClaims}
             workLogEntries={workLog.entries}
+            todos={todoStore.todos}
+            onAddTodo={todoStore.addTodo}
+            onToggleTodo={todoStore.toggleDone}
+            onRemoveTodo={todoStore.removeTodo}
+            onClearDoneTodos={todoStore.clearDone}
           />
         )}
-        {tab === "claims" && (
-          <ClaimsTable
-            claims={claims}
-            payers={payers}
-            onSelectClaim={setDetail}
-            initialSearch={claimsSearch}
-            workLogEntries={workLog.entries}
-          />
-        )}
-        {tab === "patients" && (
-          <PatientLedger
-            claims={claims}
-            workLogEntries={workLog.entries}
-            onViewClaims={handleViewClaims}
-            onSelectClaim={setDetail}
-          />
-        )}
-        {tab === "worklog" && (
-          <WorkLog
-            entries={workLog.entries}
-            onUpdateEntry={workLog.updateEntry}
-            onRemoveEntry={workLog.removeEntry}
-            onClear={workLog.clearLog}
-            onViewClaims={handleViewClaims}
-          />
-        )}
-        {tab === "upload" && (
-          <UploadTab
-            claimCount={claims.length}
-            onFile={handleFile}
-            onClear={handleClear}
-            parsing={parsing}
-          />
+        {tab === "remittance" && (
+          <>
+            {/* Sub-tab bar */}
+            <div style={{ display: "flex", gap: 5, marginBottom: 16 }}>
+              {Object.keys(REMIT_TABS).map((t) => (
+                <button
+                  key={t}
+                  className={`tab ${remitTab === t ? "tab-on" : "tab-off"}`}
+                  onClick={() => { setClaimsSearch(""); setRemitTab(t); }}
+                >
+                  {REMIT_TABS[t]}
+                </button>
+              ))}
+            </div>
+            {remitTab === "remit-dash" && (
+              <Dashboard
+                claims={claims}
+                payers={payers}
+                onNavigate={(t) => { if (["claims","patients","worklog","upload"].includes(t)) { setRemitTab(t); } else { setTab(t); } }}
+                onViewClaims={(search) => { setClaimsSearch(search); setRemitTab("claims"); }}
+                workLogEntries={workLog.entries}
+                view="remittance"
+              />
+            )}
+            {remitTab === "claims" && (
+              <ClaimsTable
+                claims={claims}
+                payers={payers}
+                onSelectClaim={setDetail}
+                initialSearch={claimsSearch}
+                workLogEntries={workLog.entries}
+              />
+            )}
+            {remitTab === "patients" && (
+              <PatientLedger
+                claims={claims}
+                workLogEntries={workLog.entries}
+                onViewClaims={(search) => { setClaimsSearch(search); setRemitTab("claims"); }}
+                onSelectClaim={setDetail}
+              />
+            )}
+            {remitTab === "worklog" && (
+              <WorkLog
+                entries={workLog.entries}
+                onUpdateEntry={workLog.updateEntry}
+                onRemoveEntry={workLog.removeEntry}
+                onClear={workLog.clearLog}
+                onViewClaims={(search) => { setClaimsSearch(search); setRemitTab("claims"); }}
+              />
+            )}
+            {remitTab === "upload" && (
+              <UploadTab
+                claimCount={claims.length}
+                onFile={handleFile}
+                onClear={handleClear}
+                parsing={parsing}
+              />
+            )}
+          </>
         )}
       </div>
     </>

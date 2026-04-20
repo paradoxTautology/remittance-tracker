@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useClaims } from "./hooks/useClaims";
 import { useWorkLog } from "./hooks/useWorkLog";
 import { useTodos } from "./hooks/useTodos";
+import TodoPanel from "./components/TodoPanel";
 import { parseCSV } from "./utils/csv";
 import { deriveStatus } from "./utils/status";
 import Dashboard from "./components/Dashboard";
@@ -276,6 +277,7 @@ export default function App() {
 
   const TOP_TABS = {
     dashboard: "Dashboard",
+    tasks: "Tasks",
     remittance: "Remittance Tracker",
   };
   const REMIT_TABS = {
@@ -287,6 +289,7 @@ export default function App() {
   };
   const _unused_TAB_LABELS = {
     dashboard: "Dashboard",
+    tasks: "Tasks",
     remittance: "Remittance",
     claims: "Claims",
     patients: "Patients",
@@ -336,7 +339,7 @@ export default function App() {
         >
           <div>
             <h1
-              style={{ fontSize: 21, fontWeight: 700, letterSpacing: "-0.3px" }}
+              style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.5px", fontFamily: "Playfair Display, serif", color: "#8B4513" }}
             >
               One Stop BS Shop
             </h1>
@@ -379,6 +382,7 @@ export default function App() {
             onToggleTodo={todoStore.toggleDone}
             onRemoveTodo={todoStore.removeTodo}
             onClearDoneTodos={todoStore.clearDone}
+            onUpdateTodo={todoStore.updateTodo}
           />
         )}
         {tab === "remittance" && (
@@ -440,6 +444,12 @@ export default function App() {
               />
             )}
           </>
+        )}
+        {tab === "tasks" && (
+          <div className="card" style={{ padding: 18 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Tasks</div>
+            <TodoPanel todos={todoStore.todos} onAdd={todoStore.addTodo} onToggle={todoStore.toggleDone} onRemove={todoStore.removeTodo} onClearDone={todoStore.clearDone} onUpdate={todoStore.updateTodo} onToggleSubtask={todoStore.toggleSubtask} onAddSubtask={todoStore.addSubtask} onRemoveSubtask={todoStore.removeSubtask} />
+          </div>
         )}
       </div>
     </>

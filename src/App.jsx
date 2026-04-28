@@ -448,7 +448,7 @@ export default function App() {
         {tab === "tasks" && (
           <div className="card" style={{ padding: 18 }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Tasks</div>
-            <TodoPanel todos={todoStore.todos} onAdd={todoStore.addTodo} onToggle={todoStore.toggleDone} onRemove={todoStore.removeTodo} onClearDone={todoStore.clearDone} onUpdate={todoStore.updateTodo} onToggleSubtask={todoStore.toggleSubtask} onAddSubtask={todoStore.addSubtask} onRemoveSubtask={todoStore.removeSubtask} />
+            <TodoPanel todos={todoStore.todos} onAdd={todoStore.addTodo} onToggle={todoStore.toggleDone} onRemove={todoStore.removeTodo} onClearDone={todoStore.clearDone} onUpdate={todoStore.updateTodo} onToggleSubtask={todoStore.toggleSubtask} onAddSubtask={todoStore.addSubtask} onRemoveSubtask={todoStore.removeSubtask} onAddAttachments={todoStore.addAttachments} onRemoveAttachment={todoStore.removeAttachment} />
           </div>
         )}
       </div>

@@ -157,7 +157,7 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims, wo
                 {payers.map((p, rowIdx) => {
                   const pc = claims.filter((c) => c.payer === p);
                   return (
-                    <tr key={p} style={{ background: rowIdx % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" }}>
+                    <tr key={p} onClick={() => onViewClaims(p)} style={{ background: rowIdx % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)", cursor: "pointer" }} onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.background = rowIdx % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)"}>
                       <td style={{ fontWeight: 500, fontSize: 12 }}>{p}</td>
                       <td className="mono" style={{ textAlign: "right", fontSize: 12, color: "#d4a843" }}>{pc.length}</td>
                       <td className="mono" style={{ textAlign: "right", fontSize: 12, color: "#6ca6d6" }}>{formatDollar(pc.reduce((s, c) => s + parseDollar(c.billed), 0))}</td>

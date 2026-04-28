@@ -58,7 +58,7 @@ const sel = { padding: "4px 6px", borderRadius: 4, border: "1px solid var(--bord
 const smBtn = (c) => ({ padding: "3px 8px", borderRadius: 4, border: "1px solid " + (c||"var(--border)"), background: "transparent", color: c||"var(--text-muted)", fontSize: 10, cursor: "pointer", fontFamily: "inherit" });
 const pill = (on) => ({ padding: "3px 8px", borderRadius: 12, fontSize: 9, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", border: on ? "1px solid var(--accent)" : "1px solid var(--border)", background: on ? "rgba(194,112,62,0.15)" : "transparent", color: on ? "var(--accent)" : "var(--text-muted)" });
 
-export default function TodoPanel({ todos, onAdd, onToggle, onRemove, onClearDone, onUpdate, onToggleSubtask, onAddSubtask, onRemoveSubtask }) {
+export default function TodoPanel({ todos, onAdd, onToggle, onRemove, onClearDone, onUpdate, onToggleSubtask, onAddSubtask, onRemoveSubtask, onAddAttachments, onRemoveAttachment }) {
   const [view, setView] = useState("list");
   const [showForm, setShowForm] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -194,6 +194,41 @@ export default function TodoPanel({ todos, onAdd, onToggle, onRemove, onClearDon
                 <button onClick={()=>{if(newSubtask.trim()){onAddSubtask?.(t.id,newSubtask.trim());setNewSubtask("");}}} style={{ padding: "4px 10px", borderRadius: 4, border: "none", background: "var(--accent)", color: "#fff", fontSize: 10, cursor: "pointer", fontFamily: "inherit" }}>+</button>
               </div>
             </div>
+            {/* Attachments */}
+            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8, marginTop: 8 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: 6 }}>
+                Attachments {(t.attachments||[]).length > 0 && `(${(t.attachments||[]).length})`}
+              </div>
+              {(t.attachments||[]).map((att, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
+                  <span style={{ fontSize: 14 }}>{att.name && att.name.endsWith(".pdf") ? "\ud83d\udcc4" : "\ud83d\udcce"}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); if (window.electronAPI) window.electronAPI.openFile(att.path); }}
+                    style={{ flex: 1, background: "transparent", border: "none", color: "var(--accent)", fontSize: 11, cursor: "pointer", fontFamily: "inherit", textAlign: "left", padding: 0 }}
+                  >
+                    {att.name}
+                  </button>
+                  <span style={{ fontSize: 9, color: "var(--text-muted)" }}>{att.size ? (att.size / 1024 < 1024 ? Math.round(att.size / 1024) + " KB" : (att.size / 1024 / 1024).toFixed(1) + " MB") : ""}</span>
+                  <button onClick={(e) => { e.stopPropagation(); onRemoveAttachment && onRemoveAttachment(t.id, idx); }}
+                    style={{ background: "transparent", border: "none", color: "var(--text-muted)", fontSize: 12, cursor: "pointer" }}>\u00d7</button>
+                </div>
+              ))}
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (window.electronAPI) {
+                    const files = await window.electronAPI.pickFiles();
+                    if (files && files.length > 0 && onAddAttachments) onAddAttachments(t.id, files);
+                  } else {
+                    alert("File attachments only work in the desktop app. Build with npm run dist first.");
+                  }
+                }}
+                style={{ marginTop: 4, padding: "4px 10px", borderRadius: 4, border: "1px dashed var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 10, cursor: "pointer", fontFamily: "inherit", width: "100%" }}
+              >
+                + Attach File
+              </button>
+            </div>
+
             <div style={{ marginTop: 8, fontSize: 9, color: "var(--text-muted)" }}>
               Added {new Date(t.createdDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
               {t.recurring && ` \u00b7 Repeats ${t.recurring}`}

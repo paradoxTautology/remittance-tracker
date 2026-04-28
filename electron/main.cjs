@@ -1,7 +1,15 @@
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, shell, ipcMain, dialog } = require("electron");
 const path = require("path");
+const fs = require("fs");
 
 let mainWindow;
+
+// Attachments folder in app data
+const getAttachmentsDir = () => {
+  const dir = path.join(app.getPath("userData"), "attachments");
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+};
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -16,17 +24,16 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, "preload.cjs"),
     },
   });
 
-  // Load the built Vite app
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
-  // Open external links in browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };
@@ -36,6 +43,59 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+// IPC: Pick files via native dialog, copy to attachments folder
+ipcMain.handle("pick-files", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openFile", "multiSelections"],
+    filters: [
+      { name: "All Files", extensions: ["*"] },
+      { name: "Documents", extensions: ["pdf", "doc", "docx", "xls", "xlsx", "csv", "txt"] },
+      { name: "Images", extensions: ["png", "jpg", "jpeg", "gif"] },
+    ],
+  });
+  if (result.canceled || result.filePaths.length === 0) return [];
+
+  const attachments = [];
+  const dir = getAttachmentsDir();
+
+  for (const srcPath of result.filePaths) {
+    const originalName = path.basename(srcPath);
+    const timestamp = Date.now();
+    const safeName = `${timestamp}_${originalName}`;
+    const destPath = path.join(dir, safeName);
+
+    try {
+      fs.copyFileSync(srcPath, destPath);
+      attachments.push({
+        name: originalName,
+        storedName: safeName,
+        path: destPath,
+        size: fs.statSync(destPath).size,
+        addedDate: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error("Failed to copy attachment:", e);
+    }
+  }
+  return attachments;
+});
+
+// IPC: Open a file with default app
+ipcMain.handle("open-file", async (event, filePath) => {
+  try {
+    await shell.openPath(filePath);
+    return true;
+  } catch (e) {
+    console.error("Failed to open file:", e);
+    return false;
+  }
+});
+
+// IPC: Get full path for a stored attachment
+ipcMain.handle("get-attachment-path", (event, storedName) => {
+  return path.join(getAttachmentsDir(), storedName);
+});
 
 app.whenReady().then(createWindow);
 

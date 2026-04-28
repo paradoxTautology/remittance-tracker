@@ -33,9 +33,10 @@ export function useTodos() {
         assignee: todo.assignee || "me",
         pinned: false,
         snoozedUntil: "",
-        subtasks: [],
+        subtasks: todo.subtasks || [],
         recurring: todo.recurring || "",
         linkedPatient: todo.linkedPatient || "",
+        attachments: todo.attachments || [],
       },
     ];
     setTodosState(next);
@@ -59,7 +60,6 @@ export function useTodos() {
     if (!todo) return;
     let next;
     if (!todo.done && todo.recurring) {
-      // Mark done and create next occurrence
       const newDue = getNextRecurring(todo.dueDate, todo.recurring);
       const clone = {
         ...todo,
@@ -114,13 +114,33 @@ export function useTodos() {
     save(next);
   }, [todos]);
 
+  const addAttachments = useCallback((todoId, files) => {
+    const next = todos.map((t) => {
+      if (t.id !== todoId) return t;
+      return { ...t, attachments: [...(t.attachments || []), ...files] };
+    });
+    setTodosState(next);
+    save(next);
+  }, [todos]);
+
+  const removeAttachment = useCallback((todoId, idx) => {
+    const next = todos.map((t) => {
+      if (t.id !== todoId) return t;
+      const atts = [...(t.attachments || [])];
+      atts.splice(idx, 1);
+      return { ...t, attachments: atts };
+    });
+    setTodosState(next);
+    save(next);
+  }, [todos]);
+
   const clearDone = useCallback(() => {
     const next = todos.filter((t) => !t.done);
     setTodosState(next);
     save(next);
   }, [todos]);
 
-  return { todos, addTodo, updateTodo, removeTodo, toggleDone, toggleSubtask, addSubtask, removeSubtask, clearDone };
+  return { todos, addTodo, updateTodo, removeTodo, toggleDone, toggleSubtask, addSubtask, removeSubtask, addAttachments, removeAttachment, clearDone };
 }
 
 function getNextRecurring(currentDue, frequency) {

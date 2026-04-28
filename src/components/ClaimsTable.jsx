@@ -99,7 +99,7 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
       if (payerFilter !== "all" && c.payer !== payerFilter) return false;
       if (search) {
         const s = search.toLowerCase();
-        return [c.patient, c.cpt, c.acnt, c.reason_codes, c.member_id, c.icn]
+        return [c.patient, c.cpt, c.acnt, c.reason_codes, c.member_id, c.icn, c.payer]
           .some((v) => (v || "").toLowerCase().includes(s));
       }
       return true;

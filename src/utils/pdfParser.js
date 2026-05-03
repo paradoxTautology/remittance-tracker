@@ -376,7 +376,90 @@ function parseClaims(text) {
  * @param {ArrayBuffer} fileBuffer - PDF file as ArrayBuffer
  * @returns {Promise<Array>} Array of claim objects
  */
+// --- Superior HealthPlan EOP Parser ---
+function parseSuperiorClaims(text) {
+  const claims = [];
+  const lines = text.split("\n");
+  let curName = "", curMbr = "", curICN = "", curPatCtrl = "";
+
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i].trim();
+    const im = ln.match(/Insured\s*Name:\s*([A-Z][A-Z, ]+?)\s{2,}Mbr\s*No:\s*(\S+)/);
+    if (im) { curName = im[1].trim(); curMbr = im[2]; }
+    const cm = ln.match(/Claim\/Ctrl\s*No:\s*(\S+)/);
+    if (cm) curICN = cm[1];
+    const pm = ln.match(/PatCtrl\s*No:\s*(\S+)/);
+    if (pm) curPatCtrl = pm[1];
+
+    const dm = ln.match(/^0100\s+(\d{1,2}\/\d{1,2}\/\d{4})\s+(\S+?)\//);
+    if (dm && curName) {
+      // Grab enough lines to capture full claim row including Payment/Withheld column
+      let block = ln;
+      for (let j = i+1; j < Math.min(i+25, lines.length); j++) {
+        const nextLn = lines[j].trim();
+        if (nextLn.startsWith("Sub-total") || nextLn.startsWith("Insured") || nextLn.startsWith("Total")) break;
+        block += " " + nextLn;
+      }
+
+      // Extract all dollar amounts
+      const amts = (block.match(/\$(\d[\d,.]*\d)/g) || []).map(a => parseFloat(a.replace("$","").replace(",","")));
+
+      // Extract reason codes - both group codes (CO 45, OA 23) and plain numeric (92)
+      const codes = [];
+      const groupCodes = block.match(/(CO|OA|PR|CR)\s+(\d+)/g);
+      if (groupCodes) groupCodes.forEach(c => codes.push(c.replace(/\s+/g, "-")));
+      // Check for standalone EX codes (like 92, us) near group codes
+      // They appear in EXPL Codes column, often before or on same line as CO/OA/PR/CR
+      const exMatches = block.match(/(?:^|\s)(\d{2,3})\s+(?:CO|OA|PR|CR)/g);
+      if (exMatches) {
+        exMatches.forEach(m => {
+          const num = m.trim().match(/^(\d{2,3})/);
+          if (num && !codes.includes(num[1])) codes.unshift(num[1]);
+        });
+      }
+      // Also check for "us" code (payment in full for Medicare/Medicaid)
+      if (block.includes(" us ") || block.match(/\bus\b.*CO/)) {
+        if (!codes.includes("us")) codes.unshift("us");
+      }
+
+      // Payment: find the last dollar amount > 0 that isn't billed or allowed
+      // In Superior EOPs, the payment column comes after all the $0.00 fields
+      let paid = 0;
+      const billed = amts[0] || 0;
+      const allowed = amts[1] || 0;
+      // Walk backwards, skip trailing $0.00s, grab the first non-zero
+      for (let k = amts.length - 1; k >= 2; k--) {
+        if (amts[k] > 0) {
+          paid = amts[k];
+          break;
+        }
+      }
+
+
+      if (billed > 0 && curName) {
+        claims.push({
+          patient: curName, member_id: curMbr, acnt: curPatCtrl,
+          dos: dm[1], payer: "Superior HealthPlan", cpt: dm[2],
+          billed: billed.toFixed(2), allowed: allowed.toFixed(2),
+          deductible: "0.00", coinsurance: "0.00", copay: "0.00",
+          prov_paid: paid.toFixed(2),
+          reason_codes: codes.join(","), icn: curICN,
+        });
+      }
+    }
+  }
+  const seen = new Set();
+  return claims.filter(c => { const k = c.icn+c.dos; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
+function detectFormat(text) {
+  if (text.includes("EXPLANATION OF PAYMENT") && text.includes("Superior HealthPlan")) return "superior";
+  return "trizetto";
+}
+
 export async function parseRemittancePDF(fileBuffer) {
   const text = await extractTextFromPDF(fileBuffer);
+  const fmt = detectFormat(text);
+  if (fmt === "superior") return parseSuperiorClaims(text);
   return parseClaims(text);
 }

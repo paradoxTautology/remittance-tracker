@@ -377,3 +377,28 @@ REASON_CODES["WM-852"] = {
   category: "Duplicate/Editing",
   fix: "WellMed flagged this as a potential duplicate. Check if a matching claim was already paid on another remittance. If not a duplicate, appeal with documentation showing services were distinct (different times, separate encounters).",
 };
+
+
+// --- Superior HealthPlan / OA codes ---
+REASON_CODES["OA-23"] = {
+  code: "OA-23",
+  group: "OA",
+  description: "The impact of prior payer(s) adjudication including payments and/or adjustments.",
+  category: "Prior Payer",
+  fix: "No action needed. This means Medicare or another primary payer already paid their portion. The current payer is paying the remainder. Verify the primary payer payment matches your records.",
+};
+REASON_CODES["92"] = {
+  code: "92",
+  group: "EX",
+  description: "Paid in full.",
+  category: "Payment",
+  fix: "No action needed. Claim was paid in full per the fee schedule.",
+};
+
+REASON_CODES["us"] = {
+  code: "us",
+  group: "EX",
+  description: "Payment in full for Medicare & Medicaid. Do not bill the patient.",
+  category: "Payment",
+  fix: "No action needed. Claim paid in full under Medicare/Medicaid. Patient cannot be balance billed.",
+};

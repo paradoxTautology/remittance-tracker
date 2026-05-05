@@ -178,7 +178,7 @@ export default function App() {
         const parsed = await parseRemittancePDF(buffer);
 
         if (!parsed.length) {
-          alert("No claims found in this PDF. Make sure it's a TriZetto/Gateway EDI remittance.");
+          alert("No claims found in this PDF. Supported formats: TriZetto, Superior, WellMed.");
           setParsing(false);
           return;
         }

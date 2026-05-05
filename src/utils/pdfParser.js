@@ -1,3 +1,4 @@
+import { parseWellMedClaims } from "./wellmedPdfParser";
 import * as pdfjsLib from "pdfjs-dist";
 
 // Polyfill: Electron may lack Uint8Array.toHex
@@ -453,6 +454,7 @@ function parseSuperiorClaims(text) {
 }
 
 function detectFormat(text) {
+  if (text.includes("WellMed") && (text.includes("Claim#:") || text.includes("QuicRemit"))) return "wellmed";
   if (text.includes("EXPLANATION OF PAYMENT") && text.includes("Superior HealthPlan")) return "superior";
   return "trizetto";
 }
@@ -461,5 +463,6 @@ export async function parseRemittancePDF(fileBuffer) {
   const text = await extractTextFromPDF(fileBuffer);
   const fmt = detectFormat(text);
   if (fmt === "superior") return parseSuperiorClaims(text);
+  if (fmt === "wellmed") return parseWellMedClaims(text);
   return parseClaims(text);
 }

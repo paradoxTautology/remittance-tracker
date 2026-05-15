@@ -6,6 +6,7 @@ import TodoPanel from "./components/TodoPanel";
 import { parseCSV } from "./utils/csv";
 import { deriveStatus } from "./utils/status";
 import Dashboard from "./components/Dashboard";
+import Statistics from "./components/Statistics";
 import ClaimsTable from "./components/ClaimsTable";
 import UploadTab from "./components/UploadTab";
 import FieldMapper from "./components/FieldMapper";
@@ -124,6 +125,9 @@ export default function App() {
     // Apply updates (replace old claims with new outcomes)
     updated.forEach((u) => {
       updatedClaims[u.oldIndex] = {
+        _prevPaid: u.oldPaid,
+        _updated: new Date().toISOString(),
+        _updateNote: `Paid updated: $${u.oldPaid.toFixed(2)} → $${u.newPaid.toFixed(2)}`,
         ...u.newClaim,
         _id: updatedClaims[u.oldIndex]._id, // keep original ID
         _imported: new Date().toISOString(),
@@ -279,6 +283,7 @@ export default function App() {
     dashboard: "Dashboard",
     tasks: "Tasks",
     remittance: "Remittance Tracker",
+    statistics: "Statistics",
   };
   const REMIT_TABS = {
     "remit-dash": "Dashboard",
@@ -450,6 +455,10 @@ export default function App() {
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Tasks</div>
             <TodoPanel todos={todoStore.todos} onAdd={todoStore.addTodo} onToggle={todoStore.toggleDone} onRemove={todoStore.removeTodo} onClearDone={todoStore.clearDone} onUpdate={todoStore.updateTodo} onToggleSubtask={todoStore.toggleSubtask} onAddSubtask={todoStore.addSubtask} onRemoveSubtask={todoStore.removeSubtask} onAddAttachments={todoStore.addAttachments} onRemoveAttachment={todoStore.removeAttachment} />
           </div>
+        )}
+
+        {tab === "statistics" && (
+          <Statistics claims={claims} />
         )}
       </div>
     </>

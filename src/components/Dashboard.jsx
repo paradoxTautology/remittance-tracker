@@ -117,6 +117,38 @@ export default function Dashboard({ claims, payers, onNavigate, onViewClaims, wo
           </div>
         </div>
 
+
+        {/* Recently Updated */}
+        {(() => {
+          const updated = claims.filter((c) => c._updated).sort((a, b) => new Date(b._updated) - new Date(a._updated));
+          if (updated.length === 0) return null;
+          return (
+            <CollapsibleSection title="Recently Updated" badge={`${updated.length}`} badgeColor="var(--blue)" defaultOpen={true}>
+              <table>
+                <thead>
+                  <tr>
+                    {["Patient", "Payer", "DOS", "Previous", "Current", "Updated"].map((h, i) => (
+                      <th key={h} style={{ textAlign: i > 2 ? "right" : "left", padding: "8px 12px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", borderBottom: "1px solid var(--border)", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {updated.slice(0, 25).map((c) => (
+                    <tr key={c._id} style={{ cursor: "pointer" }} onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "8px 12px", fontSize: 12, fontWeight: 500 }}>{c.patient}</td>
+                      <td style={{ padding: "8px 12px", fontSize: 12, color: "var(--text-secondary)" }}>{c.payer}</td>
+                      <td className="mono" style={{ padding: "8px 12px", fontSize: 11 }}>{c.dos}</td>
+                      <td className="mono" style={{ padding: "8px 12px", fontSize: 12, textAlign: "right", color: "var(--red)", textDecoration: "line-through" }}>{formatDollar(c._prevPaid || 0)}</td>
+                      <td className="mono" style={{ padding: "8px 12px", fontSize: 12, textAlign: "right", color: "var(--green)", fontWeight: 700 }}>{formatDollar(parseDollar(c.prov_paid))}</td>
+                      <td style={{ padding: "8px 12px", fontSize: 11, textAlign: "right", color: "var(--text-muted)" }}>{new Date(c._updated).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CollapsibleSection>
+          );
+        })()}
+
         {/* Reason codes */}
         {allCodes.length > 0 && (
           <div className="card" style={{ padding: 18, marginBottom: 16 }}>

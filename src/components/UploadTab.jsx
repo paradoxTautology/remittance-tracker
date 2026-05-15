@@ -33,7 +33,7 @@ export default function UploadTab({ claimCount, onFile, onClear, parsing }) {
           onDrop={(e) => {
             e.preventDefault();
             e.currentTarget.style.borderColor = "var(--border)";
-            if (!parsing && e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+            if (!parsing) Array.from(e.dataTransfer.files).forEach(f => onFile(f));
           }}
           style={parsing ? { opacity: 0.5, cursor: "wait" } : undefined}
         >
@@ -85,11 +85,11 @@ export default function UploadTab({ claimCount, onFile, onClear, parsing }) {
         </div>
 
         <input
-          type="file"
+          type="file" multiple
           accept=".csv,.pdf,.xlsx,.xls"
           ref={fileRef}
           onChange={(e) => {
-            if (e.target.files[0]) onFile(e.target.files[0]);
+            Array.from(e.target.files).forEach(f => onFile(f));
             e.target.value = "";
           }}
         />

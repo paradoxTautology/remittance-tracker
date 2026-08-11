@@ -8,7 +8,73 @@ export const STATUS_MAP = {
   reversed: { label: "Reversed", color: "#8a8078", icon: "↺" },
   pr_only: { label: "Pt Resp", color: "#d4a838", icon: "!" },
   adjusted: { label: "Adjusted", color: "#c2703e", icon: "~" },
+  // ---- Lifecycle statuses (pre-remittance) ----
+  submitted: { label: "Submitted", color: "#56a89f", icon: "↑" },
+  ch_rejected: { label: "CH Reject", color: "#b5543b", icon: "⊘" },
+  payer_rejected: { label: "Payer Reject", color: "#c94f6d", icon: "⊘" },
+  excluded: { label: "Never Sent", color: "#d9913a", icon: "∅" },
+  other_batch: { label: "Other Batch", color: "#7d99a8", icon: "»" },
 };
+
+// Statuses derived from remittance data (money truth — never overwritten by lifecycle imports)
+export const REMIT_STATUSES = [
+  "paid",
+  "partial",
+  "denied",
+  "forwarded",
+  "reversed",
+  "pr_only",
+  "adjusted",
+];
+
+// Statuses set by batch / rejection imports (pre-remittance lifecycle)
+export const LIFECYCLE_STATUSES = [
+  "submitted",
+  "ch_rejected",
+  "payer_rejected",
+  "excluded",
+  "other_batch",
+];
+
+export function isRemitStatus(s) {
+  return REMIT_STATUSES.includes(s);
+}
+
+export function isLifecycleStatus(s) {
+  return LIFECYCLE_STATUSES.includes(s);
+}
+
+/**
+ * Precedence rule for lifecycle imports:
+ *  - A remittance-derived status is the money truth → lifecycle imports never overwrite it.
+ *  - Among lifecycle statuses, the newest import wins (submitted → rejected → resubmitted → …).
+ *  - A brand-new claim (no status yet) always accepts a lifecycle status.
+ */
+export function canApplyLifecycle(currentStatus) {
+  return !isRemitStatus(currentStatus);
+}
+
+/** Map a rejectionParser record → status key. */
+export function deriveRejectionStatus(record) {
+  return record.rejectionType === "payer" ? "payer_rejected" : "ch_rejected";
+}
+
+/**
+ * Map a batchParser row → status key.
+ * zeroBalance rows return null (already paid — nothing to track).
+ */
+export function deriveBatchStatus(row) {
+  switch (row.classification) {
+    case "submitted":
+      return "submitted";
+    case "excluded":
+      return "excluded";
+    case "otherBatch":
+      return "other_batch";
+    default:
+      return null; // zeroBalance → skip
+  }
+}
 
 /**
  * Derive a claim status from reason codes and payment fields.

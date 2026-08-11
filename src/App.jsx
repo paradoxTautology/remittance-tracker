@@ -4,7 +4,14 @@ import { useWorkLog } from "./hooks/useWorkLog";
 import { useTodos } from "./hooks/useTodos";
 import TodoPanel from "./components/TodoPanel";
 import { parseCSV } from "./utils/csv";
-import { deriveStatus } from "./utils/status";
+import {
+  deriveStatus,
+  deriveRejectionStatus,
+  deriveBatchStatus,
+  canApplyLifecycle,
+  isLifecycleStatus,
+  STATUS_MAP,
+} from "./utils/status";
 import Dashboard from "./components/Dashboard";
 import Statistics from "./components/Statistics";
 import ClaimsTable from "./components/ClaimsTable";
@@ -53,8 +60,11 @@ export default function App() {
     const dos = (c.dos || "").trim();
     const cpt = (c.cpt || "").trim();
     const payer = (c.payer || "").toLowerCase().replace(/[^a-z]/g, "");
-    const acnt = (c.acnt || "").trim();
-    if (acnt) return `${name}|${dos}|${acnt}`;
+    const acnt = String(c.acnt || "").trim().replace(/^0+(?=\d)/, "");
+    // Invoice/account number is the cross-source join key (batch, rejections,
+    // remits all echo it) — when present it IS the identity, so name/DOS
+    // formatting differences between sources can never split one claim in two.
+    if (acnt) return `acnt|${acnt}`;
     return `${name}|${dos}|${cpt}|${payer}`;
   };
 
@@ -63,6 +73,78 @@ export default function App() {
     const paidA = parseFloat(a.prov_paid) || 0;
     const paidB = parseFloat(b.prov_paid) || 0;
     return paidA === paidB && a._status === b._status;
+  };
+
+  // Normalize account/invoice numbers for cross-source matching
+  const normAcnt = (v) => String(v || "").trim().replace(/^0+(?=\d)/, "");
+
+  // Merge batch / rejection records into the claims table.
+  // Rules: remit statuses are money truth (never overwritten); among
+  // lifecycle statuses the newest import wins; unknown invoices are added.
+  const importLifecycle = (records, label) => {
+    const byAcnt = {};
+    claims.forEach((c, i) => {
+      const a = normAcnt(c.acnt);
+      if (!a) return;
+      if (!byAcnt[a]) byAcnt[a] = [];
+      byAcnt[a].push(i);
+    });
+
+    const next = [...claims];
+    const added = [];
+    let flagged = 0;
+    let kept = 0;
+    let unchanged = 0;
+
+    records.forEach((r) => {
+      if (!r._status) return;
+      const a = normAcnt(r.acnt);
+      const idxs = a ? byAcnt[a] : null;
+
+      if (!idxs || idxs.length === 0) {
+        added.push(r);
+        if (a) byAcnt[a] = [-1]; // dedupe within this import
+        return;
+      }
+      if (idxs[0] === -1) {
+        unchanged++;
+        return;
+      }
+
+      const i = idxs[0];
+      const cur = next[i];
+
+      if (!canApplyLifecycle(cur._status)) {
+        kept++; // remittance already told the real story
+        return;
+      }
+      if (cur._status === r._status) {
+        unchanged++; // idempotent re-import
+        return;
+      }
+
+      const fromLabel = (STATUS_MAP[cur._status] || {}).label || cur._status || "New";
+      const toLabel = (STATUS_MAP[r._status] || {}).label || r._status;
+      next[i] = {
+        ...cur,
+        ...r,
+        _id: cur._id,
+        _updated: new Date().toISOString(),
+        _updateNote: `${fromLabel} → ${toLabel} (${label})`,
+      };
+      flagged++;
+    });
+
+    setClaims([...next, ...added]);
+
+    const parts = [];
+    if (added.length > 0) parts.push(`${added.length} new claim${added.length !== 1 ? "s" : ""} tracked`);
+    if (flagged > 0) parts.push(`${flagged} status${flagged !== 1 ? "es" : ""} updated`);
+    if (kept > 0) parts.push(`${kept} already resolved by remittance`);
+    if (unchanged > 0) parts.push(`${unchanged} unchanged`);
+    alert(`${label}: ` + (parts.length ? parts.join(" · ") : "no changes"));
+
+    setTab("claims");
   };
 
   const importClaims = (newClaims) => {
@@ -104,7 +186,13 @@ export default function App() {
       const existingClaim = matches[0].claim;
       const existingPaid = parseFloat(existingClaim.prov_paid) || 0;
 
-      if (incomingPaid === existingPaid) {
+      // A remittance outcome always supersedes a lifecycle placeholder,
+      // even when both show $0 paid (submitted → denied).
+      const lcOverride =
+        isLifecycleStatus(existingClaim._status) &&
+        !isLifecycleStatus(incoming._status);
+
+      if (incomingPaid === existingPaid && !lcOverride) {
         // Exact duplicate — skip
         skipped++;
       } else {
@@ -178,29 +266,109 @@ export default function App() {
       setParsing(true);
       try {
         const buffer = await file.arrayBuffer();
-        const { parseRemittancePDF } = await import("./utils/pdfParser");
-        const parsed = await parseRemittancePDF(buffer);
+        const { classifyAndParsePDF } = await import("./utils/pdfParser");
+        const result = await classifyAndParsePDF(buffer);
 
-        if (!parsed.length) {
-          alert("No claims found in this PDF. Supported formats: TriZetto, Superior, WellMed.");
-          setParsing(false);
-          return;
+        if (result.kind === "batch") {
+          const d = result.data;
+          const rows = [...d.submitted, ...d.excluded, ...d.otherBatch];
+          const recs = rows.map((row, i) => ({
+            patient: row.patientRaw,
+            member_id: row.policyNo || "",
+            acnt: row.invoice,
+            dos: row.dos,
+            payer: row.payer,
+            cpt: "",
+            billed: (row.charges || 0).toFixed(2),
+            allowed: "0.00",
+            deductible: "0.00",
+            coinsurance: "0.00",
+            copay: "0.00",
+            prov_paid: "0.00",
+            reason_codes:
+              row.errors && row.errors.length
+                ? "ERR-" + row.errors.map((e) => e.code).filter(Boolean).join(",")
+                : "",
+            icn: "",
+            _status: deriveBatchStatus(row),
+            _lcReason:
+              row.errors && row.errors.length
+                ? row.errors.map((e) => "Error " + e.code + ": " + e.text).join(" · ")
+                : "",
+            _lcMeta: {
+              kind: "batch",
+              batchNumber: d.batchNumber,
+              batchFile: d.batchFile,
+              postDate: row.postDate,
+              financialGroup: row.financialGroup,
+              facilityCode: row.facilityCode,
+            },
+            _submittedDate: row.classification === "submitted" ? d.printDate : row.postDate,
+            _id: Date.now() + i + Math.random(),
+            _imported: new Date().toISOString(),
+          }));
+          if (d.unparsed && d.unparsed.length) {
+            console.warn("Unparsed batch rows:", d.unparsed);
+            alert(d.unparsed.length + " batch row(s) could not be parsed — see console.");
+          }
+          if (recs.length) {
+            importLifecycle(recs, "Batch " + (d.batchNumber || "report"));
+          } else {
+            alert("Batch report parsed, but no trackable rows found.");
+          }
+        } else if (result.kind === "rejections") {
+          const recs = result.data.records.map((r, i) => ({
+            patient: r.patientRaw,
+            member_id: "",
+            acnt: r.invoice,
+            dos: r.dos,
+            payer: r.payer,
+            cpt: "",
+            billed: (r.charge || 0).toFixed(2),
+            allowed: "0.00",
+            deductible: "0.00",
+            coinsurance: "0.00",
+            copay: "0.00",
+            prov_paid: "0.00",
+            reason_codes: r.rejectionType === "payer" ? "REJ-PAYER" : "REJ-CH",
+            icn: "",
+            _status: deriveRejectionStatus(r),
+            _lcReason: r.reason,
+            _lcTimeline: r.timeline,
+            _lcMeta: { kind: "rejections", originalFile: r.originalFile, fileType: r.fileType },
+            _submittedDate: r.submissionDate,
+            _id: Date.now() + i + Math.random(),
+            _imported: new Date().toISOString(),
+          }));
+          if (recs.length) {
+            importLifecycle(recs, "Gateway rejections");
+          } else {
+            alert("Rejections report parsed, but no records found.");
+          }
+        } else {
+          const parsed = result.data;
+
+          if (!parsed.length) {
+            alert("No claims found in this PDF. Supported formats: TriZetto, Superior, WellMed.");
+            setParsing(false);
+            return;
+          }
+
+          const enriched = parsed.map((c, i) => ({
+            ...c,
+            billed: c.billed || 0,
+            allowed: c.allowed || 0,
+            deduct: c.deduct || 0,
+            coins: c.coins || 0,
+            copay: c.copay || 0,
+            prov_paid: c.prov_paid || 0,
+            _id: Date.now() + i + Math.random(),
+            _status: deriveStatus(c),
+            _imported: new Date().toISOString(),
+          }));
+
+          importClaims(enriched);
         }
-
-        const enriched = parsed.map((c, i) => ({
-          ...c,
-          billed: c.billed || 0,
-          allowed: c.allowed || 0,
-          deduct: c.deduct || 0,
-          coins: c.coins || 0,
-          copay: c.copay || 0,
-          prov_paid: c.prov_paid || 0,
-          _id: Date.now() + i + Math.random(),
-          _status: deriveStatus(c),
-          _imported: new Date().toISOString(),
-        }));
-
-        importClaims(enriched);
       } catch (err) {
         console.error("PDF parse error:", err);
         alert("Failed to parse PDF: " + err.message);

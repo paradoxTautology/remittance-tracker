@@ -466,3 +466,25 @@ export async function parseRemittancePDF(fileBuffer) {
   if (fmt === "wellmed") return parseWellMedClaims(text);
   return parseClaims(text);
 }
+
+// --- Document classification (lifecycle imports) ---
+// Routes eMDs batch reports and Gateway rejection reports to their parsers.
+// Everything else falls through to the existing remittance flow unchanged.
+export async function classifyAndParsePDF(fileBuffer) {
+  const text = await extractTextFromPDF(fileBuffer);
+
+  const rej = await import("./rejectionParser");
+  if (rej.isRejectionsReport(text)) {
+    return { kind: "rejections", data: rej.parseRejectionsReport(text) };
+  }
+
+  const bat = await import("./batchParser");
+  if (bat.isBatchReport(text)) {
+    return { kind: "batch", data: bat.parseBatchReport(text) };
+  }
+
+  const fmt = detectFormat(text);
+  if (fmt === "superior") return { kind: "remit", data: parseSuperiorClaims(text) };
+  if (fmt === "wellmed") return { kind: "remit", data: parseWellMedClaims(text) };
+  return { kind: "remit", data: parseClaims(text) };
+}

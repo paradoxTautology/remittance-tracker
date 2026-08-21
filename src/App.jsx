@@ -77,6 +77,8 @@ export default function App() {
 
   // Normalize account/invoice numbers for cross-source matching
   const normAcnt = (v) => String(v || "").trim().replace(/^0+(?=\d)/, "");
+  // App-style dates: 8/6/2026 (no leading zeros)
+  const stripDateZeros = (d) => String(d || "").replace(/\b0(\d)/g, "$1");
 
   // Merge batch / rejection records into the claims table.
   // Rules: remit statuses are money truth (never overwritten); among
@@ -192,7 +194,15 @@ export default function App() {
         isLifecycleStatus(existingClaim._status) &&
         !isLifecycleStatus(incoming._status);
 
-      if (incomingPaid === existingPaid && !lcOverride) {
+      // Identity repair: same invoice but a genuinely different patient name
+      // means the stored row is corrupt — take the incoming version.
+      const normAlpha = (s) => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+      const identityFix =
+        !!incoming.patient &&
+        !!existingClaim.patient &&
+        normAlpha(incoming.patient) !== normAlpha(existingClaim.patient);
+
+      if (incomingPaid === existingPaid && !lcOverride && !identityFix) {
         // Exact duplicate — skip
         skipped++;
       } else {
@@ -276,7 +286,7 @@ export default function App() {
             patient: row.patientRaw,
             member_id: row.policyNo || "",
             acnt: row.invoice,
-            dos: row.dos,
+            dos: stripDateZeros(row.dos),
             payer: row.payer,
             cpt: "",
             billed: (row.charges || 0).toFixed(2),
@@ -303,7 +313,7 @@ export default function App() {
               financialGroup: row.financialGroup,
               facilityCode: row.facilityCode,
             },
-            _submittedDate: row.classification === "submitted" ? d.printDate : row.postDate,
+            _submittedDate: stripDateZeros(row.classification === "submitted" ? d.printDate : row.postDate),
             _id: Date.now() + i + Math.random(),
             _imported: new Date().toISOString(),
           }));
@@ -321,7 +331,7 @@ export default function App() {
             patient: r.patientRaw,
             member_id: "",
             acnt: r.invoice,
-            dos: r.dos,
+            dos: stripDateZeros(r.dos),
             payer: r.payer,
             cpt: "",
             billed: (r.charge || 0).toFixed(2),
@@ -336,7 +346,7 @@ export default function App() {
             _lcReason: r.reason,
             _lcTimeline: r.timeline,
             _lcMeta: { kind: "rejections", originalFile: r.originalFile, fileType: r.fileType },
-            _submittedDate: r.submissionDate,
+            _submittedDate: stripDateZeros(r.submissionDate),
             _id: Date.now() + i + Math.random(),
             _imported: new Date().toISOString(),
           }));

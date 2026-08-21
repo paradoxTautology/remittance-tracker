@@ -107,7 +107,11 @@ export default function ClaimsTable({ claims, payers, onSelectClaim, initialSear
     .sort((a, b) => {
       let va = a[sortCol] || "";
       let vb = b[sortCol] || "";
-      if (
+      if (sortCol === "dos") {
+        // Chronological, format-tolerant: 8/4/2026 and 08/04/2026 both parse
+        va = Date.parse(va) || 0;
+        vb = Date.parse(vb) || 0;
+      } else if (
         ["billed", "allowed", "prov_paid", "deduct", "coins", "copay"].includes(
           sortCol
         )

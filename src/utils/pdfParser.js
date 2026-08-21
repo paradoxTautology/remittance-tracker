@@ -1,3 +1,4 @@
+import { parseSuperiorClaims } from "./superiorParser.js";
 import { parseWellMedClaims } from "./wellmedPdfParser";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -378,7 +379,7 @@ function parseClaims(text) {
  * @returns {Promise<Array>} Array of claim objects
  */
 // --- Superior HealthPlan EOP Parser ---
-function parseSuperiorClaims(text) {
+function parseSuperiorClaimsLegacy(text) {
   const claims = [];
   const lines = text.split("\n");
   let curName = "", curMbr = "", curICN = "", curPatCtrl = "";

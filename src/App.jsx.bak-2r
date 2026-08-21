@@ -116,23 +116,6 @@ export default function App() {
       const i = idxs[0];
       const cur = next[i];
 
-      // 'Not included / no errors' rows describe open invoices outside THIS
-      // batch (usually already submitted in an earlier one) — they may add a
-      // brand-new claim but never overwrite an existing status.
-      if (r._status === "other_batch") {
-        unchanged++;
-        return;
-      }
-
-      // Stale-document guard: an older report can't overwrite a newer one,
-      // so upload order no longer matters.
-      const curDoc = Date.parse(cur._lcDocDate || "");
-      const incDoc = Date.parse(r._lcDocDate || "");
-      if (!isNaN(curDoc) && !isNaN(incDoc) && incDoc < curDoc) {
-        unchanged++;
-        return;
-      }
-
       if (!canApplyLifecycle(cur._status)) {
         kept++; // remittance already told the real story
         return;
@@ -330,7 +313,6 @@ export default function App() {
               financialGroup: row.financialGroup,
               facilityCode: row.facilityCode,
             },
-            _lcDocDate: d.printDate,
             _submittedDate: stripDateZeros(row.classification === "submitted" ? d.printDate : row.postDate),
             _id: Date.now() + i + Math.random(),
             _imported: new Date().toISOString(),
@@ -364,7 +346,6 @@ export default function App() {
             _lcReason: r.reason,
             _lcTimeline: r.timeline,
             _lcMeta: { kind: "rejections", originalFile: r.originalFile, fileType: r.fileType },
-            _lcDocDate: result.data.creationDate,
             _submittedDate: stripDateZeros(r.submissionDate),
             _id: Date.now() + i + Math.random(),
             _imported: new Date().toISOString(),
